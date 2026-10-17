@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9caea3a699a54b64482f37631af0ff75, type: 3}
+  m_Name: Country_India
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.CountryDefinition
+  id: in
+  displayName: India
+  isHome: 0
+  skyColor: {r: 1, g: 0.79607844, b: 0.5568628, a: 1}
+  groundColor: {r: 0.72156864, g: 0.4745098, b: 0.2901961, a: 1}
+  primaryColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+  accentColor: {r: 0.07450981, g: 0.53333336, b: 0.03137255, a: 1}
+  difficultyTier: 2
+  requiredResidencyYears: 3
+  visaYearsRange: {x: 2, y: 5}
+  festivalNames:
+  - Holi
+  - Diwali
+  - Ganesh Chaturthi
+  - Pushkar Camel Fair
+  chunkPool:
+  - prefab: {fileID: 3446342834072502615, guid: ea88b4f3e4ce13d41b49d5c19fddce5c, type: 3}
+    weight: 1.2
+  - prefab: {fileID: 2941800626970765740, guid: 01eba531644844441892c6352601dd2c, type: 3}
+    weight: 1.2
+  - prefab: {fileID: 1942764736710946809, guid: 631e603e411b3444a8d9776326d071a8, type: 3}
+    weight: 1.2
+  - prefab: {fileID: 869757053228506523, guid: 7ab67e16f40b1a144a7b31f505507598, type: 3}
+    weight: 0.6
+  - prefab: {fileID: 7259376537453920808, guid: ba0009ba88ec460458355895e6d8ed28, type: 3}
+    weight: 0.6
+  - prefab: {fileID: 9166658697830138477, guid: e0e5ce547d0dce44f9e96a80ea95d910, type: 3}
+    weight: 0.4
+  - prefab: {fileID: 2122947493754762158, guid: 9ed8a36a8caffcc4eafb2dd1c68ab443, type: 3}
+    weight: 0.4
+  airportChunkPool: []
+  festivalZonePrefab: {fileID: 8347193149530781163, guid: 0498939a69b3aa24c9f77965d9f9909c, type: 3}
+  music: {fileID: 0}

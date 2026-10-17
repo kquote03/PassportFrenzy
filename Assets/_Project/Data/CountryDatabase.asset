@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ece83d1b2ab1d7a4f912ea8b2c155ab3, type: 3}
+  m_Name: CountryDatabase
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.CountryDatabase
+  home: {fileID: 11400000, guid: 37a7370ef9731574aa215e341050b2e9, type: 2}
+  destinations:
+  - {fileID: 11400000, guid: 0dee3cfe2be3a1b4c82336ecd33df8f3, type: 2}
+  - {fileID: 11400000, guid: 05910d440a25b4245a3c3bb863e26515, type: 2}
+  - {fileID: 11400000, guid: bc0e4a3b64bf09649ab0ac04123f40b0, type: 2}
+  - {fileID: 11400000, guid: f2a3fb1628adc594b89d03afdf3163bc, type: 2}
+  - {fileID: 11400000, guid: 5c6a67f4cbe65a54b8f763707fec11fd, type: 2}
+  - {fileID: 11400000, guid: 4f6aa7ea0ad266a409fbd16bc42be852, type: 2}
+  - {fileID: 11400000, guid: 863ebbd73a8615f4196ca6738d915c0b, type: 2}
+  - {fileID: 11400000, guid: 61f85371a667617458440fb67358871a, type: 2}
+  - {fileID: 11400000, guid: 3dc0d004741e7cf4caa548291cb884a4, type: 2}
+  - {fileID: 11400000, guid: 7f9a350d671543642abd65ba0321830b, type: 2}
+  genericChunkPool:
+  - prefab: {fileID: 9166658697830138477, guid: e0e5ce547d0dce44f9e96a80ea95d910, type: 3}
+    weight: 0.6
+  - prefab: {fileID: 869757053228506523, guid: 7ab67e16f40b1a144a7b31f505507598, type: 3}
+    weight: 1
+  - prefab: {fileID: 1752657706763025444, guid: bfd9bbf3de3e5ce4a848a0670d419657, type: 3}
+    weight: 1
+  - prefab: {fileID: 7259376537453920808, guid: ba0009ba88ec460458355895e6d8ed28, type: 3}
+    weight: 0.8
+  - prefab: {fileID: 6423977806202453584, guid: 1cf08f581d0f3d3469747633ac155457, type: 3}
+    weight: 1
+  - prefab: {fileID: 2122947493754762158, guid: 9ed8a36a8caffcc4eafb2dd1c68ab443, type: 3}
+    weight: 1.3
+  defaultAirportChasePool:
+  - prefab: {fileID: 2815421602475127786, guid: 18c32dd48c9146748a63598350bede7b, type: 3}
+    weight: 1.2
+  - prefab: {fileID: 2111841257593654902, guid: e9668d037b7077642ba9132c959a0b2b, type: 3}
+    weight: 1
+  - prefab: {fileID: 6178769051329905755, guid: 266031deca80d1b46a7b6617819b3fc0, type: 3}
+    weight: 1
+  - prefab: {fileID: 8427132451579290091, guid: 56a8b4c7f7fbfef43bacf1c54dae54b9, type: 3}
+    weight: 0.6
+  arrivalChunk: {fileID: 6673993654801543706, guid: 6486f47bd9d256841ba696e088a95787, type: 3}
+  airportEntranceChunk: {fileID: 6801943171193054740, guid: 7a82e12bd8aa28e4bad4c71d444f445f, type: 3}
+  airportSafeChunk: {fileID: 3370551051761260389, guid: e1a00d7802ca84c41a4bf6d057dc9eeb, type: 3}
+  freezoneChunk: {fileID: 156533649692207903, guid: 4cd97692101ab4f428da21aaa8c47a77, type: 3}
+  gateChunk: {fileID: 5626946027210773731, guid: f547b8461a250e94588b17c1848f12a7, type: 3}
+  homeLobbyChunk: {fileID: 1112034963663195067, guid: 06f033c08f7f1c848a235b312b9d6579, type: 3}
+  homeDoorChunk: {fileID: 5863200422409988822, guid: 629879bee03f7b74f9d78f05158b97c8, type: 3}
+  pickupPrefab: {fileID: 9016683807241428182, guid: dbaa82bf06bb02e45a407858411bc317, type: 3}
+  defaultFestivalZonePrefab: {fileID: 2748942708700959704, guid: 65dda9b8ccea35d4ba260ed8a271c9c4, type: 3}

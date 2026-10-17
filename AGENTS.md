@@ -148,7 +148,22 @@ Assets/_Project/
 Skip 30 s, +1 year here, +500 miles, spawn festival ahead, force airport transition, +3 photos, toggle demo mode, win (grant all
 passports), clear save. The header shows the state, device, years in country and the flight timer.
 
-## 11. Workflow rules (humans and agents)
+## 11. Agent testing notes (Unity MCP)
+- **Auto Refresh is OFF** in this editor (user preference): after editing scripts or assets, run `AssetDatabase.Refresh()`
+  via MCP `eval` (or MCP `recompile`), then check `recompile_status` / `console`. Batch your edits first.
+- Play mode only runs at full speed while the Unity window is the **foreground app**. When unfocused it crawls at about 2 fps
+  (`Application.runInBackground` is on, but the editor still throttles). Bring Unity to the front before timing-sensitive tests.
+- `InputSystemSettings.inputsettings.asset` sets background behavior = *Ignore Focus* and editor input = *all devices go to
+  the Game view*, so injected input works while unfocused.
+- **Use `PassportFrenzy.EditorTools.PlaytestDriver`** (MCP eval) to press keys and buttons, e.g.
+  `PlaytestDriver.TapKey(UnityEngine.InputSystem.Key.Space)`, `PlaytestDriver.TapPad(UnityEngine.InputSystem.LowLevel.GamepadButton.South)`,
+  `PlaytestDriver.FlickStick(new UnityEngine.Vector2(1,0))`. MCP `simulate_key` presses and releases inside one off-frame update,
+  so UI Submit / `WasPressedThisFrame` never see it.
+- `capture_game_view source=screen` needs an open Game view (Window > General > Game). Use `save_path` without `include_image`
+  inside `wait_for` (inline images are huge).
+- Drive the flow quickly with GameFlow debug hooks via eval (`GameRoot.I.flow.DebugForceAirport()`, `DebugGrantPhotos(3)`, ...).
+
+## 12. Workflow rules (humans and agents)
 - Use the **Unity MCP** for editor work (enter Play mode, read the console, run tests, create assets). After code changes: recompile →
   check the console for errors → run EditMode tests (`PassportFrenzy.Tests.EditMode`) → quick Play-mode smoke test.
 - Never commit a non-compiling project. Update **PROGRESS.md** (done / stubbed / bugs / decisions / next tasks) with each commit.

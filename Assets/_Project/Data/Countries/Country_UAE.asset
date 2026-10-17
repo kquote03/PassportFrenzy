@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9caea3a699a54b64482f37631af0ff75, type: 3}
+  m_Name: Country_UAE
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.CountryDefinition
+  id: ae
+  displayName: UAE
+  isHome: 1
+  skyColor: {r: 0.9647059, g: 0.84705883, b: 0.65882355, a: 1}
+  groundColor: {r: 0.8509804, g: 0.7607843, b: 0.6039216, a: 1}
+  primaryColor: {r: 0.95686275, g: 0.94509804, b: 0.91764706, a: 1}
+  accentColor: {r: 0, g: 0.47843137, b: 0.23921569, a: 1}
+  difficultyTier: 1
+  requiredResidencyYears: 99
+  visaYearsRange: {x: 1, y: 1}
+  festivalNames:
+  - Dubai Shopping Festival
+  chunkPool: []
+  airportChunkPool: []
+  festivalZonePrefab: {fileID: 0}
+  music: {fileID: 0}

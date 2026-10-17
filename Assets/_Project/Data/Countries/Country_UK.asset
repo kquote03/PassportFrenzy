@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9caea3a699a54b64482f37631af0ff75, type: 3}
+  m_Name: Country_UK
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.CountryDefinition
+  id: gb
+  displayName: UK
+  isHome: 0
+  skyColor: {r: 0.7058824, g: 0.74509805, b: 0.78431374, a: 1}
+  groundColor: {r: 0.30980393, g: 0.41960785, b: 0.30980393, a: 1}
+  primaryColor: {r: 0.003921569, g: 0.12941177, b: 0.4117647, a: 1}
+  accentColor: {r: 0.78431374, g: 0.0627451, b: 0.18039216, a: 1}
+  difficultyTier: 2
+  requiredResidencyYears: 4
+  visaYearsRange: {x: 2, y: 4}
+  festivalNames:
+  - Notting Hill Carnival
+  - Glastonbury
+  - Bonfire Night
+  - Edinburgh Fringe
+  chunkPool: []
+  airportChunkPool: []
+  festivalZonePrefab: {fileID: 0}
+  music: {fileID: 0}

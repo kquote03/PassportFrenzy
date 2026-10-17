@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11a1ef5868d53934aaf59abda9641ff2, type: 3}
+  m_Name: Buff_Shield
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.ShieldBuff
+  id: shield
+  displayName: Shield
+  description: Bubble that absorbs your next stumble or block. Activates instantly.
+  cost: 250
+  color: {r: 0.3019608, g: 0.8156863, b: 0.88235295, a: 1}
+  isPassive: 1

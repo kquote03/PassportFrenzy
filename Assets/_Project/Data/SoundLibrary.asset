@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c15c9b97900dd42ac9071ee9dcd1c6, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.SoundLibrary
+  entries:
+  - id: jump
+    clip: {fileID: 0}
+    volume: 1
+  - id: hit
+    clip: {fileID: 0}
+    volume: 1
+  - id: block
+    clip: {fileID: 0}
+    volume: 1
+  - id: shield_break
+    clip: {fileID: 0}
+    volume: 1
+  - id: photo
+    clip: {fileID: 0}
+    volume: 1
+  - id: pickup
+    clip: {fileID: 0}
+    volume: 1
+  - id: use_item
+    clip: {fileID: 0}
+    volume: 1
+  - id: booking
+    clip: {fileID: 0}
+    volume: 1
+  - id: phone_open
+    clip: {fileID: 0}
+    volume: 1
+  - id: mash
+    clip: {fileID: 0}
+    volume: 1
+  - id: stamp
+    clip: {fileID: 0}
+    volume: 1
+  - id: rejected
+    clip: {fileID: 0}
+    volume: 1
+  - id: buy
+    clip: {fileID: 0}
+    volume: 1
+  - id: takeoff
+    clip: {fileID: 0}
+    volume: 1
+  - id: flight_missed
+    clip: {fileID: 0}
+    volume: 1
+  - id: win
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_ae
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_in
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_cn
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_us
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_gb
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_de
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_fr
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_jp
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_th
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_ru
+    clip: {fileID: 0}
+    volume: 1
+  - id: music_es
+    clip: {fileID: 0}
+    volume: 1

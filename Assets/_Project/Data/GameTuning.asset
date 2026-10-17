@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b5cfc0a73bbbac4394b6c09fcbd05ea, type: 3}
+  m_Name: GameTuning
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.GameTuning
+  jamDemoMode: 1
+  demoSecondsPerYear: 6
+  demoCountryRunSeconds: 30
+  demoChaseSeconds: 30
+  secondsPerYear: 60
+  baseRunSpeed: 8
+  jumpVelocity: 13
+  gravityScale: 3.5
+  coyoteTime: 0.1
+  jumpBufferTime: 0.12
+  stumbleSpeedMultiplier: 0.25
+  stumbleRecoverSeconds: 2
+  crowdSpeedMultiplier: 0.55
+  hitInvulnerabilitySeconds: 0.6
+  speedBoostMultiplier: 1.6
+  bookingChoices: 3
+  bookingWindowSeconds: {x: 4, y: 6}
+  residencyDelayAfterBooking: 2
+  mashPressesRange: {x: 14, y: 24}
+  mashWindowSeconds: {x: 4, y: 6}
+  photosRequired: 3
+  photoAttachSeconds: 8
+  resultDisplaySeconds: 1.6
+  shopWindowSeconds: 7
+  flightTimerPaddingSeconds: 6
+  chaseSlackMultiplier: 1.25
+  flyingScreenSeconds: 2.5
+  missedScreenSeconds: 3.5
+  milesBasePerFlight: 100
+  milesPerSecondStayed: 2
+  tiers:
+  - obstacleDensity: 0.45
+    crowdDensity: 0.35
+    terminalLength: 160
+  - obstacleDensity: 0.7
+    crowdDensity: 0.6
+    terminalLength: 240
+  - obstacleDensity: 0.95
+    crowdDensity: 0.85
+    terminalLength: 320
+  spawnAheadDistance: 40
+  despawnBehindDistance: 30
+  pickupChance: 0.12
