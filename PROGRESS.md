@@ -10,8 +10,8 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M5 Airport + booking app + flight timer + chase + gate + flight transition
 - [x] M6 Residency application (mash, drag/flick photos, both failure paths)
 - [x] M7 Freezone shop + buffs + pickups
-- [ ] M8 Home menu + lose/win + save
-- [ ] M9 Debug panel + Jam Demo Mode
+- [x] M8 Home menu + lose/win + save
+- [x] M9 Debug panel + Jam Demo Mode
 - [ ] M10 Polish pass
 
 ## Done
@@ -30,7 +30,12 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
     used it in the chase → gate → flew → France run with 3 auto festival photos → airport → France APPROVED.
   - Keyboard: residency with 1 photo → **REJECTED "NOT ENOUGH PHOTOS 1/3"**; shop skipped.
   - Keyboard: no mashing → **REJECTED "TOO SLOW! Form incomplete"** → caught the flight, landed in the next country.
-  - Missed flight → back to the home menu (earlier run).
+  - Missed flight → "FLIGHT MISSED" screen → home menu, with miles/passports kept in the JSON save.
+  - Keyboard + **mouse drag-and-drop** photos → Spain APPROVED.
+  - Normal mode (demo override off): 2-year China visa = 120 s; debug +years/+photos/force airport → full airport loop.
+  - Debug panel: F1 opens it; mouse clicks on "Toggle Jam Demo Mode" (flipped ON→OFF) and "WIN" → win screen
+    (10/10, stats) → "Home Airport" → home menu.
+  - Gamepad from the home menu: Play (A) → booking → shop → chase. Prompts switch to [A]/[X]/[Y]/[Select] automatically.
 
 ## Stubbed / placeholder
 - All art is generated primitive shapes. All audio hooks are silent (null clips).
@@ -63,11 +68,13 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Booking excludes the country you're in, unless it's the last unowned one.
 - Booking and shop wait 0.35 s / 0.5 s before auto-selecting the first entry for keyboard/controller, so leftover
   jump or mash presses can't book or buy by accident (mouse works immediately).
+- Menus re-select their first entry whenever selection is lost (a stray mouse click no longer strands keyboard/controller users).
+- When the collection is complete, Play leads straight to the win screen ("New Collection" resets the save).
 - In demo mode a single 30 s visa (5 years) already satisfies most residency requirements, which keeps the demo loop short.
 
 ## Next 5 tasks
-1. Verify the debug panel (F1/Select) buttons, the demo-mode toggle and the win screen.
-2. Full run from the home menu in normal mode (debug skip) and save persistence after a missed flight.
-3. Mouse drag-and-drop for photos (only flick/arrow have been tested so far).
-4. Polish: juice, prompt glyphs, tuning; look into the occasional missed chase.
-5. Final docs pass.
+1. Polish: juice (landing dust, stamp animation, plane taking off on the flight board), camera framing.
+2. Playtest feel at real speed with a human: jump tuning, obstacle density, chase timer slack.
+3. Look into the one unexplained missed chase (see Known bugs).
+4. Audio: drop clips into SoundLibrary (all hooks are wired and silent).
+5. Art: the artist swaps the Visual sprites per AGENTS.md §7.

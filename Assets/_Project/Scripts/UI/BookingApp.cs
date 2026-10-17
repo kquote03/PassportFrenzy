@@ -35,7 +35,7 @@ namespace PassportFrenzy
             while (chosen == null && t > 0f)
             {
                 // Grace period: leftover Space/A presses (jumping, mashing) must not book instantly.
-                if (!selected && window - t >= selectDelay)
+                if ((!selected && window - t >= selectDelay) || (selected && UIRoot.NothingSelected))
                 {
                     UIRoot.Select(cards[0].gameObject);
                     selected = true;

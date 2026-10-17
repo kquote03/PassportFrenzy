@@ -77,12 +77,43 @@ namespace PassportFrenzy.EditorTools
             return $"queued flick {dir}";
         }
 
+        public static Mouse VirtualMouse =>
+            InputSystem.GetDevice(MouseName) as Mouse ?? InputSystem.AddDevice<Mouse>(MouseName);
+
+        const string MouseName = "PlaytestMouse";
+
+        /// <summary>Left-drag from one screen point to another over several frames (uGUI drag and drop).</summary>
+        public static string DragMouse(Vector2 from, Vector2 to, int moveFrames = 8)
+        {
+            var mouse = VirtualMouse;
+            Enqueue(0, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = from }));
+            Enqueue(1, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = from }.WithButton(MouseButton.Left)));
+            for (int i = 1; i <= moveFrames; i++)
+            {
+                var p = Vector2.Lerp(from, to, i / (float)moveFrames);
+                Enqueue(1, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = p }.WithButton(MouseButton.Left)));
+            }
+            Enqueue(1, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = to }));
+            return $"queued drag {from} -> {to}";
+        }
+
+        /// <summary>Left-click at a screen point.</summary>
+        public static string ClickMouse(Vector2 at)
+        {
+            var mouse = VirtualMouse;
+            Enqueue(0, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = at }));
+            Enqueue(1, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = at }.WithButton(MouseButton.Left)));
+            Enqueue(2, () => InputSystem.QueueStateEvent(mouse, new MouseState { position = at }));
+            return $"queued click {at}";
+        }
+
         /// <summary>Remove the virtual devices (call when done so they don't linger).</summary>
         public static void RemoveDevices()
         {
             Steps.Clear();
             if (InputSystem.GetDevice(KeyboardName) is { } k) InputSystem.RemoveDevice(k);
             if (InputSystem.GetDevice(GamepadName) is { } g) InputSystem.RemoveDevice(g);
+            if (InputSystem.GetDevice(MouseName) is { } m) InputSystem.RemoveDevice(m);
         }
 
         static void Enqueue(int delayFrames, System.Action a)

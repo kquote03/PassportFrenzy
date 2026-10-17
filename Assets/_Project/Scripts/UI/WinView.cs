@@ -34,5 +34,10 @@ namespace PassportFrenzy
         }
 
         public void Hide() => panel.SetActive(false);
+
+        void Update()
+        {
+            if (panel.activeSelf && UIRoot.NothingSelected) UIRoot.Select(homeButton.gameObject);
+        }
     }
 }

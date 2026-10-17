@@ -41,7 +41,7 @@ namespace PassportFrenzy
             while (!_done && t > 0f)
             {
                 // Grace period so leftover mash presses can't buy the first item by accident.
-                if (!selected && window - t >= selectDelay)
+                if ((!selected && window - t >= selectDelay) || (selected && UIRoot.NothingSelected))
                 {
                     UIRoot.Select(items.Length > 0 && items[0].gameObject.activeSelf ? items[0].gameObject : skipButton.gameObject);
                     selected = true;

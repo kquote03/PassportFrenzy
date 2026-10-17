@@ -13,7 +13,17 @@ namespace PassportFrenzy
         [SerializeField] TMP_Text statsText;
         [SerializeField] TMP_Text controlsText;
 
-        void Awake() => playButton.onClick.AddListener(() => GameRoot.I.flow.StartRun());
+        const string ControlsTemplate = "{Jump} Jump    {Photo} Photo    {Use} Use item    {Debug} Debug";
+
+        void Awake()
+        {
+            playButton.onClick.AddListener(() => GameRoot.I.flow.StartRun());
+            InputDeviceTracker.Changed += OnDeviceChanged;
+        }
+
+        void OnDestroy() => InputDeviceTracker.Changed -= OnDeviceChanged;
+
+        void OnDeviceChanged(ControlScheme _) => controlsText.text = InputPrompts.Format(ControlsTemplate);
 
         public void Show()
         {
@@ -25,7 +35,7 @@ namespace PassportFrenzy
             foreach (var c in db.destinations)
                 if (c != null) sb.Append(d.Owns(c.id) ? $"<color=#2a8a2a>[{c.displayName}]</color> " : $"<color=#888888>{c.displayName}</color> ");
             statsText.text = sb.ToString();
-            controlsText.text = InputPrompts.Format("{Jump} Jump    {Photo} Photo    {Use} Use item    {Debug} Debug");
+            controlsText.text = InputPrompts.Format(ControlsTemplate);
             UIRoot.Select(playButton.gameObject);
         }
 
@@ -33,11 +43,8 @@ namespace PassportFrenzy
 
         void Update()
         {
-            // Keep a controller user from ever losing focus on the menu.
-            if (panel.activeSelf && UnityEngine.EventSystems.EventSystem.current != null &&
-                UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == null &&
-                InputDeviceTracker.Current == ControlScheme.Gamepad)
-                UIRoot.Select(playButton.gameObject);
+            // Keyboard/controller users must never lose focus (a stray mouse click on the background deselects).
+            if (panel.activeSelf && UIRoot.NothingSelected) UIRoot.Select(playButton.gameObject);
         }
     }
 }

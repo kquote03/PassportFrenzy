@@ -274,6 +274,7 @@ namespace PassportFrenzy
             StopSequence();
             if (Run != null) Run.FlightTimerActive = false;
             SetState(GameState.Won);
+            R.ui.HideOverlays();
             R.ui.phone.Close();
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);

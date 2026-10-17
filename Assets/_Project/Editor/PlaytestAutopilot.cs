@@ -25,6 +25,8 @@ namespace PassportFrenzy.EditorTools
         public static bool AutoPhoto = true;
         public static bool UseItemInChase = true;
         public static bool PressPlayOnMenu = true;
+        /// <summary>Attach residency photos by mouse drag-and-drop instead of stick/arrow.</summary>
+        public static bool MouseDrag;
 
         static bool _on, _hooked;
         static string _handledKey;
@@ -109,6 +111,18 @@ namespace PassportFrenzy.EditorTools
                     {
                         Log("mash x30");
                         for (int i = 0; i < 30; i++) MashOnce();
+                    }
+                    else if (app.CurrentPhase == ResidencyApp.Phase.Photos && MouseDrag && Once("photos"))
+                    {
+                        // Drag each tray card onto the paper (screen-space overlay canvas: world pos == screen pos).
+                        var paper = (RectTransform)app.transform.Find("PhotoGroup/Paper");
+                        var cards = app.GetComponentsInChildren<PhotoDragItem>();
+                        int n = Mathf.Min(Photos, cards.Length);
+                        Log($"drag {n} photo(s) onto the paper with the mouse");
+                        // The tray re-flows after each attach, so the next card always sits in the top slot.
+                        Vector2 top = cards.Length > 0 ? (Vector2)cards[0].transform.position : Vector2.zero;
+                        for (int i = 0; i < n; i++)
+                            PlaytestDriver.DragMouse(top, paper.TransformPoint(paper.rect.center)); // paper pivot is top-right
                     }
                     else if (app.CurrentPhase == ResidencyApp.Phase.Photos && Once("photos"))
                     {

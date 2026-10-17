@@ -24,6 +24,9 @@ namespace PassportFrenzy
             win.Hide();
         }
 
+        public static bool NothingSelected =>
+            EventSystem.current != null && EventSystem.current.currentSelectedGameObject == null;
+
         public static void Select(GameObject go)
         {
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(go);
