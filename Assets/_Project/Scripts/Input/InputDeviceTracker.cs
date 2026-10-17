@@ -13,10 +13,16 @@ namespace PassportFrenzy
         public static event Action<ControlScheme> Changed;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Init()
+        static void ResetStatics()
         {
             Current = ControlScheme.KeyboardMouse;
             Changed = null;
+        }
+
+        // Subscribe after the Input System has initialized for this Play session (domain reload is off).
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Init()
+        {
             InputSystem.onActionChange -= OnActionChange;
             InputSystem.onActionChange += OnActionChange;
         }

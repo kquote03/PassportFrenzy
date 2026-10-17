@@ -15,6 +15,8 @@ namespace PassportFrenzy
     /// </summary>
     public class ResidencyApp : MonoBehaviour
     {
+        public enum Phase { Idle, Mash, Photos, Result }
+
         [SerializeField] PhoneView phone;
 
         [Header("Mash phase")]
@@ -38,6 +40,10 @@ namespace PassportFrenzy
         readonly List<PhotoDragItem> _items = new List<PhotoDragItem>();
         int _clicks, _attached;
 
+        /// <summary>Current step (read by tests/automation).</summary>
+        public Phase CurrentPhase { get; private set; }
+        public int AttachedCount => _attached;
+
         public RectTransform DragLayer => (RectTransform)GetComponentInParent<Canvas>().rootCanvas.transform;
 
         void Awake() => mashButton.onClick.AddListener(() => _clicks++);
@@ -51,6 +57,7 @@ namespace PassportFrenzy
             ClearItems();
 
             // ---- Phase 1: mash
+            CurrentPhase = Phase.Mash;
             mashGroup.SetActive(true);
             photoGroup.SetActive(false);
             int target = UnityEngine.Random.Range(T.mashPressesRange.x, T.mashPressesRange.y + 1);
@@ -77,6 +84,7 @@ namespace PassportFrenzy
             }
 
             // ---- Phase 2: photos
+            CurrentPhase = Phase.Photos;
             mashGroup.SetActive(false);
             photoGroup.SetActive(true);
             int required = T.photosRequired;
@@ -117,6 +125,8 @@ namespace PassportFrenzy
 
         IEnumerator ShowResult(bool ok, string message)
         {
+            CurrentPhase = Phase.Result;
+            Debug.Log($"[Residency] {(ok ? "APPROVED" : "REJECTED")}: {message.Replace("\n", " ")}");
             stampText.gameObject.SetActive(true);
             stampText.text = message;
             stampText.color = ok ? new Color(0.1f, 0.6f, 0.15f) : new Color(0.85f, 0.1f, 0.1f);
@@ -124,6 +134,7 @@ namespace PassportFrenzy
             GameRoot.I.audioManager.Play(ok ? SoundIds.Stamp : SoundIds.Rejected);
             if (GameRoot.I.Cam != null) GameRoot.I.Cam.Shake(0.12f);
             yield return new WaitForSeconds(GameRoot.I.tuning.resultDisplaySeconds);
+            CurrentPhase = Phase.Idle;
         }
 
         void AttachNext()

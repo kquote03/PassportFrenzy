@@ -13,6 +13,8 @@ namespace PassportFrenzy
         [SerializeField] Button skipButton;
         [SerializeField] TMP_Text milesText;
         [SerializeField] TMP_Text infoText;
+        [Tooltip("Seconds before the first item is selected for keyboard/controller (mouse works immediately).")]
+        [SerializeField] float selectDelay = 0.5f;
 
         bool _done;
 
@@ -34,12 +36,16 @@ namespace PassportFrenzy
             }
             var held = root.buffs.Held;
             infoText.text = held != null ? $"Holding: {held.displayName} (1 item max)" : "One item per trip. Choose wisely!";
-            yield return null;
-            UIRoot.Select(items.Length > 0 && items[0].gameObject.activeSelf ? items[0].gameObject : skipButton.gameObject);
-
             float t = window;
+            bool selected = false;
             while (!_done && t > 0f)
             {
+                // Grace period so leftover mash presses can't buy the first item by accident.
+                if (!selected && window - t >= selectDelay)
+                {
+                    UIRoot.Select(items.Length > 0 && items[0].gameObject.activeSelf ? items[0].gameObject : skipButton.gameObject);
+                    selected = true;
+                }
                 milesText.text = $"Miles: {SaveSystem.Data.miles}";
                 foreach (var it in items) if (it.gameObject.activeSelf) it.Refresh(SaveSystem.Data.miles);
                 t -= Time.deltaTime;

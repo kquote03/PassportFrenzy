@@ -12,6 +12,8 @@ namespace PassportFrenzy
         [SerializeField] PhoneView phone;
         [SerializeField] BookingCardView[] cards;
         [SerializeField] TMP_Text hintText;
+        [Tooltip("Seconds before the first card is selected for keyboard/controller (mouse works immediately).")]
+        [SerializeField] float selectDelay = 0.35f;
 
         public IEnumerator Run(List<BookingOption> options, float window, Action<BookingOption> onPicked)
         {
@@ -28,12 +30,16 @@ namespace PassportFrenzy
                 cards[i].Bind(options[i], spy, SaveSystem.Data.Owns(options[i].country.id), () => chosen ??= index);
             }
             hintText.text = InputPrompts.Format("Pick fast! {Submit} to book");
-            yield return null; // let layout settle before selecting
-            UIRoot.Select(cards[0].gameObject);
-
             float t = window;
+            bool selected = false;
             while (chosen == null && t > 0f)
             {
+                // Grace period: leftover Space/A presses (jumping, mashing) must not book instantly.
+                if (!selected && window - t >= selectDelay)
+                {
+                    UIRoot.Select(cards[0].gameObject);
+                    selected = true;
+                }
                 t -= Time.deltaTime;
                 phone.SetTimer(t / window, t);
                 yield return null;

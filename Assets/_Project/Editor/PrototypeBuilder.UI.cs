@@ -297,7 +297,7 @@ namespace PassportFrenzy.EditorTools
             Img(crowd, Hex("#E76F51"));
             var cap = Txt(rt, "Caption", "Festival", 16, Ink, TextAlignmentOptions.Center, true);
             cap.textWrappingMode = TextWrappingModes.NoWrap;
-            cap.overflowMode = TextOverflowModes.Ellipsis;
+            cap.overflowMode = TextOverflowModes.Truncate; // LiberationSans has no ellipsis glyph
             Place(cap.rectTransform, BottomCenter, BottomCenter, new Vector2(0f, 2f), new Vector2(160f, 28f));
             S(item, "caption", cap);
             return rt.gameObject;

@@ -26,6 +26,7 @@ namespace PassportFrenzy
 
         void SetState(GameState s)
         {
+            Debug.Log($"[Flow] {State} -> {s}");
             State = s;
             GameEvents.RaiseStateChanged(s);
         }
@@ -239,6 +240,7 @@ namespace PassportFrenzy
 
         void MissFlight()
         {
+            Debug.Log($"[Flow] Flight missed in state {State}, {R.spawner.PlannedGateX - R.player.transform.position.x:0} m short of the gate");
             StopSequence();
             Run.FlightTimerActive = false;
             Run.FlightSecondsRemaining = 0f;

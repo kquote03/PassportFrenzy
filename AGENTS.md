@@ -157,8 +157,15 @@ passports), clear save. The header shows the state, device, years in country and
   the Game view*, so injected input works while unfocused.
 - **Use `PassportFrenzy.EditorTools.PlaytestDriver`** (MCP eval) to press keys and buttons, e.g.
   `PlaytestDriver.TapKey(UnityEngine.InputSystem.Key.Space)`, `PlaytestDriver.TapPad(UnityEngine.InputSystem.LowLevel.GamepadButton.South)`,
-  `PlaytestDriver.FlickStick(new UnityEngine.Vector2(1,0))`. MCP `simulate_key` presses and releases inside one off-frame update,
-  so UI Submit / `WasPressedThisFrame` never see it.
+  `PlaytestDriver.FlickStick(new UnityEngine.Vector2(1,0))`. It injects on virtual devices inside the game's own input update.
+  MCP `simulate_key` (and events queued straight from eval) get processed in the *editor* input update, which gameplay never sees.
+- `PlaytestDriver.Prepare()` also sets `Time.captureDeltaTime = 1/30`, so game time advances per frame (deterministic even at
+  a few fps while unfocused). It's reset when Play mode exits.
+- **`PassportFrenzy.EditorTools.PlaytestAutopilot.Run(gamepad, bookingIndex, mash, photos, shopIndex, ...)`** is a bot that plays
+  through the flow (booking pick, mashing, photo attach via flick or arrow, shop buy/skip, auto-jump when blocked, auto-photo,
+  item use in the chase). Follow it in `Logs/Editor.log` (or MCP console) via `[Flow]`, `[Residency]` and `[Autopilot]` lines.
+  Typical scenario: Autopilot.Run(...) → eval the GameFlow debug hooks (`StartRun`, private `Land` via reflection, `DebugAddYear`,
+  `DebugGrantPhotos`, `DebugForceAirport`) → wait for states with MCP `wait_for` (`findType: PassportFrenzy.GameFlow`, member `State`).
 - `capture_game_view source=screen` needs an open Game view (Window > General > Game). Use `save_path` without `include_image`
   inside `wait_for` (inline images are huge).
 - Drive the flow quickly with GameFlow debug hooks via eval (`GameRoot.I.flow.DebugForceAirport()`, `DebugGrantPhotos(3)`, ...).

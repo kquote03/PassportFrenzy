@@ -6,10 +6,10 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M1 Project setup + docs skeleton (folders, asmdefs, input actions, TMP essentials, AGENTS/CLAUDE/PROGRESS, runtime scripts + tests compiling)
 - [x] M2 Runner + input + chunks (placeholder sprites, PrototypeBuilder, GameRoot, player, camera, spawner, generic chunks)
 - [x] M3 Obstacles / crowds (slow, block, crowd, moving; all prefabs built)
-- [ ] M4 Country run: 10 countries, visa timer, HUD, festivals/photos, Spain/Japan/India prefabs
-- [ ] M5 Airport + booking app + flight timer + chase + gate + flight transition
-- [ ] M6 Residency application (mash, drag/flick photos, both failure paths)
-- [ ] M7 Freezone shop + buffs + pickups
+- [x] M4 Country run: 10 countries, visa timer, HUD, festivals/photos, Spain/Japan/India prefabs
+- [x] M5 Airport + booking app + flight timer + chase + gate + flight transition
+- [x] M6 Residency application (mash, drag/flick photos, both failure paths)
+- [x] M7 Freezone shop + buffs + pickups
 - [ ] M8 Home menu + lose/win + save
 - [ ] M9 Debug panel + Jam Demo Mode
 - [ ] M10 Polish pass
@@ -24,13 +24,21 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   player, camera, 13 UI prefabs, PF_GameRoot and Game.unity (the only build scene).
 - Playtested via MCP: home menu → Play → door → booking (auto-pick) → shop (timeout) → chase (blocked by luggage cart) →
   flight missed → back to the home menu. No console errors.
-- `Editor/PlaytestDriver.cs`: input injection helper for agents (see AGENTS.md §11).
+- `Editor/PlaytestDriver.cs` + `Editor/PlaytestAutopilot.cs`: input injection and a bot for MCP end-to-end tests (AGENTS.md §11).
+- Verified with the Autopilot (demo mode):
+  - Gamepad: booking (D-pad + A) → mash (A) → stick-flick 3 photos → **APPROVED** (Japan passport saved) → bought Speed Boost →
+    used it in the chase → gate → flew → France run with 3 auto festival photos → airport → France APPROVED.
+  - Keyboard: residency with 1 photo → **REJECTED "NOT ENOUGH PHOTOS 1/3"**; shop skipped.
+  - Keyboard: no mashing → **REJECTED "TOO SLOW! Form incomplete"** → caught the flight, landed in the next country.
+  - Missed flight → back to the home menu (earlier run).
 
 ## Stubbed / placeholder
 - All art is generated primitive shapes. All audio hooks are silent (null clips).
 
 ## Known bugs
-- (none yet)
+- One Autopilot chase (Germany → ?) ended in a missed flight even though it jumped when blocked. Cause not confirmed: maybe
+  bad luck with obstacles, maybe a seam snag. `[Flow] Flight missed ... m short` is now logged to diagnose it.
+- `simulate_key` (MCP) doesn't drive gameplay. Use PlaytestDriver instead (see AGENTS.md).
 
 ## Decisions log
 - **Passports are a lifetime collection** (user decision). Booking hides countries owned from any run; win = all 10 owned.
@@ -53,10 +61,13 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Flight timer = shop window + (residency budget if eligible) + filler run + expected chase (terminal / speed × crowd factor × slack) + padding.
   Finishing menus early banks time.
 - Booking excludes the country you're in, unless it's the last unowned one.
+- Booking and shop wait 0.35 s / 0.5 s before auto-selecting the first entry for keyboard/controller, so leftover
+  jump or mash presses can't book or buy by accident (mouse works immediately).
+- In demo mode a single 30 s visa (5 years) already satisfies most residency requirements, which keeps the demo loop short.
 
 ## Next 5 tasks
-1. Playtest the country run: obstacles, jump feel, festival photo, visa timer → airport transition.
-2. Playtest booking choice, residency (success, timeout, too few photos) and shop purchase.
-3. Controller pass with the virtual gamepad (menus, flick attach).
-4. Debug panel and demo-mode toggle verification; win screen.
-5. Polish: juice, prompt glyphs, tuning.
+1. Verify the debug panel (F1/Select) buttons, the demo-mode toggle and the win screen.
+2. Full run from the home menu in normal mode (debug skip) and save persistence after a missed flight.
+3. Mouse drag-and-drop for photos (only flick/arrow have been tested so far).
+4. Polish: juice, prompt glyphs, tuning; look into the occasional missed chase.
+5. Final docs pass.
