@@ -33,6 +33,48 @@ namespace PassportFrenzy.EditorTools
 
         public static int PendingSteps => Steps.Count;
 
+        // Held input (e.g. "keep walking right" in free-movement mode) is merged into every injected state.
+        static readonly HashSet<Key> HeldKeys = new HashSet<Key>();
+        static Vector2 _heldStick;
+
+        static KeyboardState Kb(params Key[] extra)
+        {
+            var keys = new List<Key>(HeldKeys);
+            keys.AddRange(extra);
+            return new KeyboardState(keys.ToArray());
+        }
+
+        static GamepadState Pad(GamepadButton? button = null, Vector2? stick = null)
+        {
+            var s = button.HasValue ? new GamepadState(button.Value) : new GamepadState();
+            s.leftStick = stick ?? _heldStick;
+            return s;
+        }
+
+        /// <summary>Hold or release a key until changed (merged with taps).</summary>
+        public static string SetHeldKey(Key key, bool held)
+        {
+            var kb = VirtualKeyboard;
+            Enqueue(0, () =>
+            {
+                if (held) HeldKeys.Add(key); else HeldKeys.Remove(key);
+                InputSystem.QueueStateEvent(kb, Kb());
+            });
+            return $"held {key}={held}";
+        }
+
+        /// <summary>Hold the left stick at a direction until changed (Vector2.zero releases).</summary>
+        public static string SetHeldStick(Vector2 dir)
+        {
+            var pad = VirtualGamepad;
+            Enqueue(0, () =>
+            {
+                _heldStick = dir;
+                InputSystem.QueueStateEvent(pad, Pad());
+            });
+            return $"held stick {dir}";
+        }
+
         /// <summary>Optional: also route real devices to the game while the editor is unfocused.</summary>
         public static string Prepare()
         {
@@ -49,8 +91,8 @@ namespace PassportFrenzy.EditorTools
         public static string TapKey(Key key, int holdFrames = 3)
         {
             var kb = VirtualKeyboard;
-            Enqueue(0, () => InputSystem.QueueStateEvent(kb, new KeyboardState(key)));
-            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(kb, new KeyboardState()));
+            Enqueue(0, () => InputSystem.QueueStateEvent(kb, Kb(key)));
+            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(kb, Kb()));
             return $"queued tap {key}";
         }
 
@@ -64,16 +106,16 @@ namespace PassportFrenzy.EditorTools
         public static string TapPad(GamepadButton button, int holdFrames = 3)
         {
             var pad = VirtualGamepad;
-            Enqueue(0, () => InputSystem.QueueStateEvent(pad, new GamepadState(button)));
-            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, new GamepadState()));
+            Enqueue(0, () => InputSystem.QueueStateEvent(pad, Pad(button)));
+            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, Pad()));
             return $"queued pad {button}";
         }
 
         public static string FlickStick(Vector2 dir, int holdFrames = 4)
         {
             var pad = VirtualGamepad;
-            Enqueue(0, () => InputSystem.QueueStateEvent(pad, new GamepadState { leftStick = dir }));
-            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, new GamepadState()));
+            Enqueue(0, () => InputSystem.QueueStateEvent(pad, Pad(stick: dir)));
+            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, Pad()));
             return $"queued flick {dir}";
         }
 
@@ -111,6 +153,8 @@ namespace PassportFrenzy.EditorTools
         public static void RemoveDevices()
         {
             Steps.Clear();
+            HeldKeys.Clear();
+            _heldStick = Vector2.zero;
             if (InputSystem.GetDevice(KeyboardName) is { } k) InputSystem.RemoveDevice(k);
             if (InputSystem.GetDevice(GamepadName) is { } g) InputSystem.RemoveDevice(g);
             if (InputSystem.GetDevice(MouseName) is { } m) InputSystem.RemoveDevice(m);
@@ -131,6 +175,8 @@ namespace PassportFrenzy.EditorTools
             {
                 if (s != PlayModeStateChange.ExitingPlayMode) return;
                 Steps.Clear();
+                HeldKeys.Clear();
+                _heldStick = Vector2.zero;
                 Time.captureDeltaTime = 0f;
             };
         }

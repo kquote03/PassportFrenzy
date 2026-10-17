@@ -10,6 +10,7 @@ namespace PassportFrenzy
     {
         static readonly (string token, string km, string pad)[] Tokens =
         {
+            ("{Move}", "[A/D]", "[L-Stick]"),
             ("{Jump}", "[Space]", "[A]"),
             ("{Photo}", "[F]", "[X]"),
             ("{Use}", "[E]", "[Y]"),

@@ -17,6 +17,9 @@ MonoBehaviour:
   demoCountryRunSeconds: 30
   demoChaseSeconds: 30
   secondsPerYear: 60
+  autoRun: 0
+  moveAcceleration: 60
+  maxBacktrackDistance: 18
   baseRunSpeed: 8
   jumpVelocity: 13
   gravityScale: 3.5
@@ -52,6 +55,10 @@ MonoBehaviour:
   - obstacleDensity: 0.95
     crowdDensity: 0.85
     terminalLength: 320
+  visaDistanceSlack: 0.85
+  noFestivalChance: 0.05
+  twoFestivalChance: 0.05
+  minRunSecondsForTwoFestivals: 20
   spawnAheadDistance: 40
   despawnBehindDistance: 30
   pickupChance: 0.12

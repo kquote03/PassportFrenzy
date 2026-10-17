@@ -27,6 +27,7 @@ namespace PassportFrenzy
         float _boostTimer, _boostMultiplier = 1f;
         float _invulnTimer, _coyoteTimer, _jumpBufferTimer;
         float _flashTimer, _runPhase;
+        float _moveX, _facing = 1f, _furthestX, _leftLimit;
         Vector3 _visualBasePos, _visualBaseScale = Vector3.one;
         SpriteRenderer _visualRenderer;
         Color _visualBaseColor = Color.white;
@@ -71,6 +72,9 @@ namespace PassportFrenzy
             _rb.position = position;
             transform.position = position;
             _rb.linearVelocity = Vector2.zero;
+            _furthestX = position.x;
+            _leftLimit = position.x - 8f; // chunks start ~10 m behind the spawn point
+            _facing = 1f;
             _crowds.Clear();
             Blocked = false;
             _stumbleTimer = 0f;
@@ -89,6 +93,8 @@ namespace PassportFrenzy
         {
             var input = GameRoot.I.input;
             if (input.Jump.WasPressedThisFrame()) _jumpBufferTimer = T.jumpBufferTime;
+            _moveX = Running && !input.MenuMode ? input.Move.ReadValue<Vector2>().x : 0f;
+            if (Mathf.Abs(_moveX) < 0.2f) _moveX = 0f;
 
             float dt = Time.deltaTime;
             _jumpBufferTimer -= dt;
@@ -108,13 +114,31 @@ namespace PassportFrenzy
             Grounded = _rb.IsTouching(_groundFilter);
             if (Grounded) _coyoteTimer = T.coyoteTime;
 
-            CurrentSpeed = ComputeSpeed();
-            _rb.linearVelocity = new Vector2(CurrentSpeed, _rb.linearVelocity.y);
+            if (T.autoRun)
+            {
+                CurrentSpeed = Blocked ? 0f : ComputeSpeed();
+                _rb.linearVelocity = new Vector2(CurrentSpeed, _rb.linearVelocity.y);
+                return;
+            }
+
+            // Free movement (experiment): Move input drives speed; obstacles/crowds/boost still scale it.
+            float target = _moveX * ComputeSpeed();
+            if (Blocked && target > 0f) target = 0f;           // walls only stop forward motion; back off, then jump
+            float vx = Mathf.MoveTowards(_rb.linearVelocity.x, target, T.moveAcceleration * Time.fixedDeltaTime);
+
+            float x = _rb.position.x;
+            _furthestX = Mathf.Max(_furthestX, x);
+            _leftLimit = Mathf.Max(_leftLimit, _furthestX - T.maxBacktrackDistance);
+            if (x <= _leftLimit && vx < 0f) vx = 0f;           // can't walk back into despawned chunks
+
+            if (Mathf.Abs(vx) > 0.1f) _facing = Mathf.Sign(vx);
+            CurrentSpeed = Mathf.Abs(vx);
+            _rb.linearVelocity = new Vector2(vx, _rb.linearVelocity.y);
         }
 
         float ComputeSpeed()
         {
-            if (!Running || Blocked) return 0f;
+            if (!Running) return 0f;
             float speed = T.baseRunSpeed;
             if (_stumbleTimer > 0f)
             {
@@ -138,7 +162,7 @@ namespace PassportFrenzy
             Blocked = false;
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, T.jumpVelocity);
             GameRoot.I.audioManager.Play(SoundIds.Jump);
-            if (visual != null) visual.localScale = Vector3.Scale(_visualBaseScale, new Vector3(0.8f, 1.2f, 1f));
+            if (visual != null) visual.localScale = Vector3.Scale(FacingScale, new Vector3(0.8f, 1.2f, 1f));
         }
 
         /// <summary>Obstacle hit. Returns true if the hit was handled (applied or absorbed by shield).</summary>
@@ -174,6 +198,8 @@ namespace PassportFrenzy
             return true;
         }
 
+        public void ClearBlocked() => Blocked = false;
+
         public void EnterCrowd(CrowdZone zone) { if (!_crowds.Contains(zone)) _crowds.Add(zone); }
         public void ExitCrowd(CrowdZone zone) => _crowds.Remove(zone);
 
@@ -190,18 +216,21 @@ namespace PassportFrenzy
             _boostMultiplier = multiplier;
         }
 
+        Vector3 FacingScale => new Vector3(Mathf.Abs(_visualBaseScale.x) * _facing, _visualBaseScale.y, _visualBaseScale.z);
+
         void UpdateFeedback(float dt)
         {
             if (visual != null)
             {
-                visual.localScale = Vector3.Lerp(visual.localScale, _visualBaseScale, 10f * dt);
+                if (Mathf.Sign(visual.localScale.x) != Mathf.Sign(FacingScale.x)) visual.localScale = Vector3.Scale(visual.localScale, new Vector3(-1f, 1f, 1f));
+                visual.localScale = Vector3.Lerp(visual.localScale, FacingScale, 10f * dt);
                 if (proceduralAnimation)
                 {
                     // Run bob + forward lean scaled by speed; leans back a little in the air.
                     float speed01 = Mathf.Clamp01(CurrentSpeed / Mathf.Max(0.01f, T.baseRunSpeed));
                     _runPhase += dt * (6f + 8f * speed01);
                     float bob = Grounded ? Mathf.Abs(Mathf.Sin(_runPhase)) * 0.08f * speed01 : 0f;
-                    float lean = Grounded ? -8f * speed01 : 6f;
+                    float lean = (Grounded ? -8f * speed01 : 6f) * _facing;
                     visual.localPosition = _visualBasePos + new Vector3(0f, bob, 0f);
                     visual.localRotation = Quaternion.Slerp(visual.localRotation, Quaternion.Euler(0f, 0f, lean), 12f * dt);
                 }

@@ -14,6 +14,15 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M9 Debug panel + Jam Demo Mode
 - [x] M10 Polish pass (procedural run bob/lean, boost tint, crowd status, menu focus, scale fix). More polish welcome; see Next tasks
 
+## Branch `experiment/free-movement` (this branch)
+- [x] Free movement (no auto-scroll) behind `GameTuning.autoRun` (off on this branch): A/D, ←/→, left stick, D-pad.
+  Blocks re-arm when you back off; 18 m backtrack limit; facing flip; smaller camera lead; `{Move}` prompt on the menu.
+- Verified via MCP: idle = no movement; D → right (to 44.6), A → back to the 18 m limit (26.4) with the sprite flipped; device prompt
+  switches to [L-Stick]. Autopilot loops from the home menu on keyboard and gamepad: door → booking → shop → chase → land →
+  country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
+- Open questions for playtest: should free mode get a bigger visa slack (lower `visaDistanceSlack`)? Should walls be physical?
+  Should the player keep moving in menus?
+
 ## Post-prototype fixes (after M10)
 - [x] Residency time pauses at airports (and after a visa overstay). The HUD shows "(paused at airport)".
 - [x] Festivals per visit are planned by `FestivalPlanner`: 90% one, 5% none, 5% two (two only on runs ≥ 20 s with distinct

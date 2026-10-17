@@ -29,6 +29,7 @@ namespace PassportFrenzy.EditorTools
         public static bool MouseDrag;
 
         static bool _on, _hooked;
+        static bool _holdingRight;
         static string _handledKey;
         static float _nextJumpTime;
 
@@ -46,6 +47,7 @@ namespace PassportFrenzy.EditorTools
             PressPlayOnMenu = pressPlayOnMenu;
             PlaytestDriver.Prepare();
             _handledKey = null;
+            _holdingRight = false;
             _on = true;
             if (!_hooked)
             {
@@ -83,6 +85,16 @@ namespace PassportFrenzy.EditorTools
 
             var root = GameRoot.I;
             var flow = root.flow;
+            // Free-movement experiment: hold "right" while running, release in menus.
+            bool shouldHold = !root.tuning.autoRun && !root.input.MenuMode && flow.State is GameState.Departing
+                or GameState.CountryRun or GameState.ToAirport or GameState.Chase;
+            if (shouldHold != _holdingRight)
+            {
+                _holdingRight = shouldHold;
+                if (Gamepad) PlaytestDriver.SetHeldStick(shouldHold ? Vector2.right : Vector2.zero);
+                else PlaytestDriver.SetHeldKey(Key.D, shouldHold);
+                return;
+            }
             var selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
 
             switch (flow.State)

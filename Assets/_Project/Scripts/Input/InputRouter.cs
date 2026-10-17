@@ -13,6 +13,7 @@ namespace PassportFrenzy
 
         InputActionMap _gameplay, _ui;
 
+        public InputAction Move { get; private set; }
         public InputAction Jump { get; private set; }
         public InputAction Photo { get; private set; }
         public InputAction UseItem { get; private set; }
@@ -28,6 +29,7 @@ namespace PassportFrenzy
         {
             _gameplay = actions.FindActionMap("Gameplay", true);
             _ui = actions.FindActionMap("UI", true);
+            Move = _gameplay.FindAction("Move", true);
             Jump = _gameplay.FindAction("Jump", true);
             Photo = _gameplay.FindAction("Photo", true);
             UseItem = _gameplay.FindAction("UseItem", true);

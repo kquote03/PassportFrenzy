@@ -16,6 +16,18 @@ namespace PassportFrenzy
 
         protected abstract bool ApplyHit(RunnerController runner);
 
+        /// <summary>Make the obstacle hittable again (free-movement mode: you backed off instead of jumping).</summary>
+        protected void Rearm()
+        {
+            _used = false;
+            foreach (var sr in GetComponentsInChildren<SpriteRenderer>())
+            {
+                var c = sr.color;
+                c.a = 1f;
+                sr.color = c;
+            }
+        }
+
         void OnTriggerEnter2D(Collider2D other) => TryHit(other);
         void OnTriggerStay2D(Collider2D other) => TryHit(other); // retry after hit-invulnerability ends
 
