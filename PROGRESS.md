@@ -12,7 +12,7 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M7 Freezone shop + buffs + pickups
 - [x] M8 Home menu + lose/win + save
 - [x] M9 Debug panel + Jam Demo Mode
-- [ ] M10 Polish pass
+- [x] M10 Polish pass (procedural run bob/lean, boost tint, crowd status, menu focus, scale fix). More polish welcome; see Next tasks
 
 ## Done
 - Folder layout, asmdefs (Runtime / Editor / Tests.EditMode), TMP Essentials imported.
@@ -38,11 +38,15 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   - Gamepad from the home menu: Play (A) → booking → shop → chase. Prompts switch to [A]/[X]/[Y]/[Select] automatically.
 
 ## Stubbed / placeholder
-- All art is generated primitive shapes. All audio hooks are silent (null clips).
+- All art is generated primitive shapes. All audio hooks are silent (null clips); music per country is wired the same way.
+- No real animation: the player uses procedural squash/bob/lean (toggle on PF_Player).
+- Rogue-like upgrades that bias visa RNG (mentioned in the original pitch) aren't implemented; the visa range lives in each Country asset.
 
 ## Known bugs
 - One Autopilot chase (Germany → ?) ended in a missed flight even though it jumped when blocked. Cause not confirmed: maybe
   bad luck with obstacles, maybe a seam snag. `[Flow] Flight missed ... m short` is now logged to diagnose it.
+- Editor-only noise unrelated to the game: "UnityConnectWebRequestException: Token Exchange failed" and
+  "Account API did not become accessible" (Unity account/AI Assistant packages, offline or unfocused editor).
 - `simulate_key` (MCP) doesn't drive gameplay. Use PlaytestDriver instead (see AGENTS.md).
 
 ## Decisions log
@@ -66,6 +70,7 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Flight timer = shop window + (residency budget if eligible) + filler run + expected chase (terminal / speed × crowd factor × slack) + padding.
   Finishing menus early banks time.
 - Booking excludes the country you're in, unless it's the last unowned one.
+- Fixed: the player Visual used to drift to scale 1 (the feedback lerp targeted Vector3.one). It now returns to its authored scale.
 - Booking and shop wait 0.35 s / 0.5 s before auto-selecting the first entry for keyboard/controller, so leftover
   jump or mash presses can't book or buy by accident (mouse works immediately).
 - Menus re-select their first entry whenever selection is lost (a stray mouse click no longer strands keyboard/controller users).

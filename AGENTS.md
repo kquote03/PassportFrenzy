@@ -121,11 +121,14 @@ Assets/_Project/
 3. If the Visual has a **PaletteTint** component, it recolors the sprite per country at runtime. For full-color art, delete
    PaletteTint (or set Role = None) and set the SpriteRenderer color to white.
 4. Compound placeholder shapes (e.g. the plane or a crowd of capsules) are children of `Visual`. Delete or replace them freely.
-5. UI: phone/menu prefabs are in `Prefabs/UI`. Swap Image sprites and TMP fonts freely. Don't rename objects that scripts
+   Chunks keep their decorative sprites (buildings, windows, signs) under a `Backdrop` child. Also art, also free to replace.
+5. The player's `RunnerController` animates the Visual transform (squash on jump, run bob/lean, hit flash, boost tint).
+   When you add a real Animator, untick **Procedural Animation** on `PF_Player` (and, if needed, animate a child *under* Visual).
+6. UI: phone/menu prefabs are in `Prefabs/UI`. Swap Image sprites and TMP fonts freely. Don't rename objects that scripts
    reference through serialized fields (re-link them in the Inspector if you do).
-6. **Never run `Passport Frenzy/Rebuild ALL (overwrites)`** after you've started swapping art: it regenerates every prefab from code.
+7. **Never run `Passport Frenzy/Rebuild ALL (overwrites)`** after you've started swapping art: it regenerates every prefab from code.
    `Build Missing Assets` is safe (it only creates what doesn't exist).
-7. Sounds: assign clips in `Data/SoundLibrary.asset` (ids: jump, hit, block, shield_break, photo, pickup, use_item, booking,
+8. Sounds: assign clips in `Data/SoundLibrary.asset` (ids: jump, hit, block, shield_break, photo, pickup, use_item, booking,
    phone_open, mash, stamp, rejected, buy, takeoff, flight_missed, win, music_<countryId>).
 
 ## 8. How to add a country (no code)

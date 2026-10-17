@@ -111,7 +111,8 @@ namespace PassportFrenzy
             string status = "";
             if (root.player.HasShield) status += "SHIELD  ";
             if (root.player.BoostSecondsRemaining > 0f) status += $"BOOST {root.player.BoostSecondsRemaining:0}s  ";
-            if (root.player.Blocked) status += InputPrompts.Format("BLOCKED! {Jump}");
+            if (root.player.InCrowd) status += "CROWD - slowed  ";
+            if (root.player.Blocked) status += InputPrompts.Format("BLOCKED! {Jump}  ");
             if (T.DemoMode) status += "  [DEMO]";
             statusText.text = status;
         }

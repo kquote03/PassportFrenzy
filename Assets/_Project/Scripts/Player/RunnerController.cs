@@ -14,6 +14,9 @@ namespace PassportFrenzy
         [SerializeField] GameObject shieldVisual;
         [Tooltip("Child that gets squashed/flashed for feedback (the 'Visual' child).")]
         [SerializeField] Transform visual;
+        [Tooltip("Placeholder run bob/lean on the Visual. Turn off once the artist adds a real run animation.")]
+        [SerializeField] bool proceduralAnimation = true;
+        [SerializeField] Color boostTint = new Color(0.4f, 1f, 1f);
 
         Rigidbody2D _rb;
         ContactFilter2D _groundFilter;
@@ -23,7 +26,8 @@ namespace PassportFrenzy
         float _stumbleTimer, _stumbleDuration = 1f, _stumbleMultiplier = 1f;
         float _boostTimer, _boostMultiplier = 1f;
         float _invulnTimer, _coyoteTimer, _jumpBufferTimer;
-        float _flashTimer;
+        float _flashTimer, _runPhase;
+        Vector3 _visualBasePos, _visualBaseScale = Vector3.one;
         SpriteRenderer _visualRenderer;
         Color _visualBaseColor = Color.white;
 
@@ -43,7 +47,12 @@ namespace PassportFrenzy
             _rb.freezeRotation = true;
             _rb.interpolation = RigidbodyInterpolation2D.Interpolate;
             _groundFilter = new ContactFilter2D { useTriggers = false, useNormalAngle = true, minNormalAngle = 60f, maxNormalAngle = 120f };
-            if (visual != null) _visualRenderer = visual.GetComponent<SpriteRenderer>();
+            if (visual != null)
+            {
+                _visualRenderer = visual.GetComponent<SpriteRenderer>();
+                _visualBasePos = visual.localPosition;
+                _visualBaseScale = visual.localScale;
+            }
             if (_visualRenderer != null) _visualBaseColor = _visualRenderer.color;
             if (shieldVisual != null) shieldVisual.SetActive(false);
         }
@@ -129,7 +138,7 @@ namespace PassportFrenzy
             Blocked = false;
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, T.jumpVelocity);
             GameRoot.I.audioManager.Play(SoundIds.Jump);
-            if (visual != null) visual.localScale = new Vector3(0.8f, 1.2f, 1f);
+            if (visual != null) visual.localScale = Vector3.Scale(_visualBaseScale, new Vector3(0.8f, 1.2f, 1f));
         }
 
         /// <summary>Obstacle hit. Returns true if the hit was handled (applied or absorbed by shield).</summary>
@@ -184,11 +193,25 @@ namespace PassportFrenzy
         void UpdateFeedback(float dt)
         {
             if (visual != null)
-                visual.localScale = Vector3.Lerp(visual.localScale, Vector3.one, 10f * dt);
+            {
+                visual.localScale = Vector3.Lerp(visual.localScale, _visualBaseScale, 10f * dt);
+                if (proceduralAnimation)
+                {
+                    // Run bob + forward lean scaled by speed; leans back a little in the air.
+                    float speed01 = Mathf.Clamp01(CurrentSpeed / Mathf.Max(0.01f, T.baseRunSpeed));
+                    _runPhase += dt * (6f + 8f * speed01);
+                    float bob = Grounded ? Mathf.Abs(Mathf.Sin(_runPhase)) * 0.08f * speed01 : 0f;
+                    float lean = Grounded ? -8f * speed01 : 6f;
+                    visual.localPosition = _visualBasePos + new Vector3(0f, bob, 0f);
+                    visual.localRotation = Quaternion.Slerp(visual.localRotation, Quaternion.Euler(0f, 0f, lean), 12f * dt);
+                }
+            }
             if (_visualRenderer != null)
             {
                 _flashTimer -= dt;
-                _visualRenderer.color = _flashTimer > 0f && Mathf.Repeat(_flashTimer, 0.1f) > 0.05f ? Color.red : _visualBaseColor;
+                Color c = _visualBaseColor;
+                if (_boostTimer > 0f) c = Color.Lerp(_visualBaseColor, boostTint, 0.5f + 0.5f * Mathf.Sin(Time.time * 20f));
+                _visualRenderer.color = _flashTimer > 0f && Mathf.Repeat(_flashTimer, 0.1f) > 0.05f ? Color.red : c;
             }
         }
 
