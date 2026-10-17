@@ -76,14 +76,16 @@ namespace PassportFrenzy
             Run.RunSeconds += dt;
             SaveSystem.Data.secondsPlayed += dt;
 
-            if (State is GameState.CountryRun or GameState.ToAirport or GameState.Booking or GameState.Residency
-                or GameState.Shop or GameState.Chase)
-                Run.AddTimeInCurrent(dt);
+            bool inCountry = State is GameState.CountryRun or GameState.ToAirport;
 
-            if (State == GameState.CountryRun)
+            // Residency only accrues while living in the country on a valid visa: paused at airports and after overstaying.
+            if (inCountry && !Run.VisaOverstayed) Run.AddTimeInCurrent(dt);
+
+            // Visa deadline: the airport is at the end of the country; reach it before the visa runs out.
+            if (inCountry && !Run.VisaOverstayed)
             {
                 Run.VisaSecondsRemaining -= dt;
-                if (Run.VisaSecondsRemaining <= 0f) BeginAirportApproach();
+                if (Run.VisaSecondsRemaining <= 0f) Overstay();
             }
 
             if (Run.FlightTimerActive)
@@ -100,7 +102,7 @@ namespace PassportFrenzy
             switch (id)
             {
                 case FlowTriggerId.HomeDoor when State == GameState.Departing:
-                case FlowTriggerId.AirportEntrance when State == GameState.ToAirport:
+                case FlowTriggerId.AirportEntrance when State is GameState.CountryRun or GameState.ToAirport:
                     _sequence = StartCoroutine(AirportSequence());
                     break;
                 case FlowTriggerId.Gate when State == GameState.Chase:
@@ -109,14 +111,28 @@ namespace PassportFrenzy
             }
         }
 
-        void BeginAirportApproach()
+        /// <summary>Visa ran out before reaching the airport: all (lifetime) miles are confiscated; the run goes on.</summary>
+        void Overstay()
         {
             Run.VisaSecondsRemaining = 0f;
+            Run.VisaOverstayed = true;
+            int lost = SaveSystem.Data.miles;
+            Run.MilesLostToOverstay += lost;
+            SaveSystem.SetMiles(0);
+            Debug.Log($"[Flow] Visa overstayed in {Run.Current.displayName}: {lost} miles confiscated");
+            R.audioManager.Play(SoundIds.VisaOverstay);
+            if (R.Cam != null) R.Cam.Shake(0.3f, 0.4f);
+            GameEvents.RaiseToast(lost > 0 ? $"VISA OVERSTAYED! {lost} miles confiscated" : "VISA OVERSTAYED! (no miles to confiscate)");
+        }
+
+        /// <summary>Debug: drop the airport entrance just ahead of the player.</summary>
+        void BeginAirportApproach()
+        {
             SetState(GameState.ToAirport);
             R.spawner.TrimAhead(18f);
             R.spawner.SetMode(SpawnMode.AirportSafe);
             R.spawner.EnqueueOnce(R.countries.airportEntranceChunk);
-            GameEvents.RaiseToast("Visa expiring! Head to the airport!");
+            GameEvents.RaiseToast("Head to the airport!");
         }
 
         // ------------------------------------------------------------------ Airport: booking -> residency -> shop -> chase
@@ -219,12 +235,16 @@ namespace PassportFrenzy
             Run.Current = c;
             Run.Destination = null;
             Run.SecondsThisStay = 0f;
+            Run.VisaOverstayed = false;
             Run.CountriesVisited++;
             SaveSystem.Data.countriesVisited++;
             SaveSystem.Save();
             Run.VisaSecondsTotal = Run.VisaSecondsRemaining = T.CountryRunSeconds(visaYears);
 
-            R.spawner.ResetWorld(SpawnMode.Country, c, c.difficultyTier, R.countries.arrivalChunk);
+            float length = T.CountryLength(visaYears);
+            var festivals = FestivalPlanner.Plan(c, R.countries.genericFestivalChunk, length, Run.VisaSecondsTotal, T, _rng);
+            Debug.Log($"[Festival] {c.displayName}: {festivals.Count} festival(s) planned over {length:0} m");
+            R.spawner.BeginCountry(c, c.difficultyTier, length, festivals, R.countries.arrivalChunk, playerStart.x);
             R.player.ResetTo(playerStart);
             R.player.SetRunning(true);
             R.Cam.SnapToTarget();
@@ -295,14 +315,14 @@ namespace PassportFrenzy
         {
             if (Run == null) return;
             Run.AddTimeInCurrent(seconds);
-            if (State == GameState.CountryRun) Run.VisaSecondsRemaining -= seconds;
+            if (State is GameState.CountryRun or GameState.ToAirport) Run.VisaSecondsRemaining -= seconds;
         }
 
         public void DebugAddYear() => Run?.AddTimeInCurrent(T.SecondsPerYear);
 
         public void DebugForceAirport()
         {
-            if (State == GameState.CountryRun) BeginAirportApproach();
+            if (State is GameState.CountryRun) BeginAirportApproach();
         }
 
         public void DebugGrantPhotos(int count)

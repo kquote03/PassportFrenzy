@@ -14,6 +14,7 @@ namespace PassportFrenzy.EditorTools
         static GameObject _bull, _fence, _lantern, _commuters, _cow, _rickshaw;
         static GameObject _festGeneric, _festTomatina, _festHanami, _festHoli, _pickup;
         internal static Chunk ChArrival, ChEntrance, ChLobby, ChFreezone, ChGate, ChHomeLobby, ChHomeDoor;
+        internal static Chunk ChFiller;
         internal static Chunk ChFlat, ChSuitcases, ChCones, ChCrowd, ChMixed, ChFestival;
         internal static Chunk ChAirCrowd, ChAirCarts, ChAirMixed, ChAirClear;
         internal static Chunk ChSpainBulls, ChSpainPlaza, ChSpainTomatina, ChJapanLanterns, ChJapanCommuters, ChJapanHanami;
@@ -536,6 +537,7 @@ namespace PassportFrenzy.EditorTools
             const string G = "Generic", A = "Airport", H = "Home";
 
             // ---- Generic country chunks (palette from the country)
+            ChFiller = MakeChunk(G, "PF_Chunk_Generic_Filler6", ChunkKind.Country, 6f, Backdrop.Street, 7, null);
             ChFlat = MakeChunk(G, "PF_Chunk_Generic_Flat", ChunkKind.Country, L, Backdrop.Street, 1, go => Socket(go.transform, 12f, 1.2f, 1.5f));
             ChSuitcases = MakeChunk(G, "PF_Chunk_Generic_Suitcases", ChunkKind.Country, L, Backdrop.Street, 2, go =>
             {

@@ -34,6 +34,8 @@ namespace PassportFrenzy
 
         // Timers
         public float VisaSecondsTotal, VisaSecondsRemaining;
+        public bool VisaOverstayed;          // visa ran out before reaching the airport (miles confiscated)
+        public int MilesLostToOverstay;
         public bool FlightTimerActive;
         public float FlightSecondsTotal, FlightSecondsRemaining;
 

@@ -32,16 +32,13 @@ MonoBehaviour:
     weight: 1.2
   - prefab: {fileID: 4889777373312114947, guid: 48be7a88a0e3f344aa4fb014d5f41731, type: 3}
     weight: 1.2
-  - prefab: {fileID: 6019525560026701695, guid: fd2709e43701d3149ba320778a12265e, type: 3}
-    weight: 1.2
   - prefab: {fileID: 869757053228506523, guid: 7ab67e16f40b1a144a7b31f505507598, type: 3}
     weight: 0.6
   - prefab: {fileID: 6423977806202453584, guid: 1cf08f581d0f3d3469747633ac155457, type: 3}
     weight: 0.6
   - prefab: {fileID: 9166658697830138477, guid: e0e5ce547d0dce44f9e96a80ea95d910, type: 3}
     weight: 0.4
-  - prefab: {fileID: 2122947493754762158, guid: 9ed8a36a8caffcc4eafb2dd1c68ab443, type: 3}
-    weight: 0.4
   airportChunkPool: []
+  signatureFestivalChunk: {fileID: 6019525560026701695, guid: fd2709e43701d3149ba320778a12265e, type: 3}
   festivalZonePrefab: {fileID: 3838818821710593470, guid: 2b95a1bc4c9aad8488e8f81d3b5c60aa, type: 3}
   music: {fileID: 0}

@@ -36,6 +36,27 @@ namespace PassportFrenzy.EditorTools
             Debug.Log(Build(true));
         }
 
+        [MenuItem("Passport Frenzy/Rebuild Data Assets (safe for art)", priority = 2)]
+        static void RebuildDataMenu() => Debug.Log(RebuildData());
+
+        /// <summary>
+        /// Refills only data assets (buffs, countries, CountryDatabase, SoundLibrary; GameTuning values are kept) from
+        /// code, without regenerating any prefab. Safe after the artist has swapped sprites.
+        /// MCP: PassportFrenzy.EditorTools.PrototypeBuilder.RebuildData()
+        /// </summary>
+        public static string RebuildData()
+        {
+            _log.Clear();
+            _overwrite = false;
+            BuildWorldPrefabs();   // only loads the existing prefabs (nothing is overwritten)
+            var data = BuildCoreData();
+            _overwrite = true;
+            try { BuildCountries(data); }
+            finally { _overwrite = false; }
+            AssetDatabase.SaveAssets();
+            return "[PrototypeBuilder] data rebuilt\n" + string.Join("\n", _log);
+        }
+
         /// <summary>Entry point for MCP/eval: PassportFrenzy.EditorTools.PrototypeBuilder.Build(false).</summary>
         public static string Build(bool overwrite)
         {

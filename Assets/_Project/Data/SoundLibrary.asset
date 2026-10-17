@@ -58,6 +58,9 @@ MonoBehaviour:
   - id: flight_missed
     clip: {fileID: 0}
     volume: 1
+  - id: visa_overstay
+    clip: {fileID: 0}
+    volume: 1
   - id: win
     clip: {fileID: 0}
     volume: 1

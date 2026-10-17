@@ -48,6 +48,13 @@ namespace PassportFrenzy
             GameEvents.RaiseMilesChanged();
         }
 
+        public static void SetMiles(int miles)
+        {
+            Data.miles = Mathf.Max(0, miles);
+            Save();
+            GameEvents.RaiseMilesChanged();
+        }
+
         public static void GrantPassport(string countryId)
         {
             if (Data.Owns(countryId)) return;

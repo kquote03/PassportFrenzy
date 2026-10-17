@@ -42,6 +42,9 @@ namespace PassportFrenzy
         public WeightedChunk[] chunkPool = Array.Empty<WeightedChunk>();
         [Tooltip("Airport chase chunks. Empty = CountryDatabase.defaultAirportChasePool.")]
         public WeightedChunk[] airportChunkPool = Array.Empty<WeightedChunk>();
+        [Tooltip("Optional unique festival chunk (e.g. La Tomatina). Used for the first planned festival of a visit; "
+                 + "its FestivalZone name override is the festival's name.")]
+        public Chunk signatureFestivalChunk;
         [Tooltip("Festival zone used by the debug 'spawn festival' button. Empty = database default.")]
         public FestivalZone festivalZonePrefab;
 

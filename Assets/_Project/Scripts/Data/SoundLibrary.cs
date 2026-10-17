@@ -43,6 +43,7 @@ namespace PassportFrenzy
         public const string Buy = "buy";
         public const string Takeoff = "takeoff";
         public const string FlightMissed = "flight_missed";
+        public const string VisaOverstay = "visa_overstay";
         public const string Win = "win";
         /// <summary>Music entries are named "music_&lt;countryId&gt;", e.g. music_jp.</summary>
         public const string MusicPrefix = "music_";
@@ -50,7 +51,7 @@ namespace PassportFrenzy
         public static readonly string[] All =
         {
             Jump, Hit, Block, ShieldBreak, Photo, Pickup, UseItem, Booking, PhoneOpen,
-            Mash, Stamp, Rejected, Buy, Takeoff, FlightMissed, Win,
+            Mash, Stamp, Rejected, Buy, Takeoff, FlightMissed, VisaOverstay, Win,
         };
     }
 }

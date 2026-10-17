@@ -115,19 +115,28 @@ namespace PassportFrenzy.EditorTools
 
         static WeightedChunk[] GenericPool() => new[]
         {
-            W(ChFlat, 0.6f), W(ChSuitcases, 1f), W(ChCones, 1f), W(ChCrowd, 0.8f), W(ChMixed, 1f), W(ChFestival, 1.3f),
+            // Festivals are not in the random pools: FestivalPlanner places 0/1/2 per visit.
+            W(ChFlat, 0.6f), W(ChSuitcases, 1f), W(ChCones, 1f), W(ChCrowd, 0.8f), W(ChMixed, 1f),
         };
 
         static WeightedChunk[] PoolFor(string id)
         {
             switch (id)
             {
-                case "es": return new[] { W(ChSpainBulls, 1.3f), W(ChSpainPlaza, 1f), W(ChSpainTomatina, 1.2f), W(ChCones, 0.6f), W(ChMixed, 0.6f), W(ChFlat, 0.4f), W(ChFestival, 0.4f) };
-                case "jp": return new[] { W(ChJapanLanterns, 1.2f), W(ChJapanCommuters, 1.2f), W(ChJapanHanami, 1.2f), W(ChSuitcases, 0.6f), W(ChMixed, 0.6f), W(ChFlat, 0.4f), W(ChFestival, 0.4f) };
-                case "in": return new[] { W(ChIndiaCows, 1.2f), W(ChIndiaRickshaw, 1.2f), W(ChIndiaHoli, 1.2f), W(ChSuitcases, 0.6f), W(ChCrowd, 0.6f), W(ChFlat, 0.4f), W(ChFestival, 0.4f) };
+                case "es": return new[] { W(ChSpainBulls, 1.3f), W(ChSpainPlaza, 1f), W(ChCones, 0.6f), W(ChMixed, 0.6f), W(ChFlat, 0.4f) };
+                case "jp": return new[] { W(ChJapanLanterns, 1.2f), W(ChJapanCommuters, 1.2f), W(ChSuitcases, 0.6f), W(ChMixed, 0.6f), W(ChFlat, 0.4f) };
+                case "in": return new[] { W(ChIndiaCows, 1.2f), W(ChIndiaRickshaw, 1.2f), W(ChSuitcases, 0.6f), W(ChCrowd, 0.6f), W(ChFlat, 0.4f) };
                 default: return System.Array.Empty<WeightedChunk>(); // falls back to the database's generic pool
             }
         }
+
+        static Chunk SignatureFestivalFor(string id) => id switch
+        {
+            "es" => ChSpainTomatina,
+            "jp" => ChJapanHanami,
+            "in" => ChIndiaHoli,
+            _ => null,
+        };
 
         static FestivalZone FestivalFor(string id) => id switch
         {
@@ -159,6 +168,7 @@ namespace PassportFrenzy.EditorTools
                 c.chunkPool = home ? System.Array.Empty<WeightedChunk>() : PoolFor(s.id);
                 c.airportChunkPool = System.Array.Empty<WeightedChunk>();
                 c.festivalZonePrefab = FestivalFor(s.id);
+                c.signatureFestivalChunk = home ? null : SignatureFestivalFor(s.id);
             });
         }
 
@@ -172,6 +182,8 @@ namespace PassportFrenzy.EditorTools
                 db.destinations = dest;
                 db.genericChunkPool = GenericPool();
                 db.defaultAirportChasePool = new[] { W(ChAirCrowd, 1.2f), W(ChAirCarts, 1f), W(ChAirMixed, 1f), W(ChAirClear, 0.6f) };
+                db.genericFestivalChunk = ChFestival;
+                db.fillerChunk = ChFiller;
                 db.arrivalChunk = ChArrival;
                 db.airportEntranceChunk = ChEntrance;
                 db.airportSafeChunk = ChLobby;

@@ -26,5 +26,6 @@ MonoBehaviour:
   - Dubai Shopping Festival
   chunkPool: []
   airportChunkPool: []
+  signatureFestivalChunk: {fileID: 0}
   festivalZonePrefab: {fileID: 0}
   music: {fileID: 0}

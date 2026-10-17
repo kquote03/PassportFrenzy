@@ -14,6 +14,18 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M9 Debug panel + Jam Demo Mode
 - [x] M10 Polish pass (procedural run bob/lean, boost tint, crowd status, menu focus, scale fix). More polish welcome; see Next tasks
 
+## Post-prototype fixes (after M10)
+- [x] Residency time pauses at airports (and after a visa overstay). The HUD shows "(paused at airport)".
+- [x] Festivals per visit are planned by `FestivalPlanner`: 90% one, 5% none, 5% two (two only on runs ≥ 20 s with distinct
+  names; the signature festival goes first). Festival chunks were removed from the random pools.
+- [x] Visa deadline: each country run is a fixed length ending at the airport (visa × speed × 0.85). Overstaying sets miles to 0
+  (toast, shake, `visa_overstay` sound hook); the run continues. HUD: "Visa left 0:12 - Airport in 64 m" (red when you can't
+  make it any more).
+- Verified via MCP Autopilot: residency frozen through booking/shop/chase (10.900 s before and after). China/UK visits had
+  1 festival each, and reached the airport with 1.1 s of visa left. Blocking the player made the visa expire → "VISA OVERSTAYED!
+  1320 miles confiscated", miles 0, residency capped at the visa length, and the run still reached the airport.
+  15 EditMode tests pass (6 new planner/visa tests).
+
 ## Done
 - Folder layout, asmdefs (Runtime / Editor / Tests.EditMode), TMP Essentials imported.
 - `Input/PassportFrenzyControls.inputactions`: Gameplay (Jump, Photo, UseItem) and UI (Navigate, Submit, Cancel, Point, Click,
@@ -60,7 +72,11 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Demo mode toggle in the debug panel is a runtime override (doesn't dirty the asset).
 - Shield applies immediately and doesn't use the item slot; it absorbs one Slow/Block hit, not crowds.
 - Pickups are ignored ("Hands full!") when the item slot is occupied.
-- Residency time accrues during the country run and that country's airport sequence (until takeoff), never at home.
+- Residency time accrues only during the country run on a valid visa (paused at airports and after an overstay), never at home.
+- Photos required stays 3 (user decision), so with about 1 festival per visit a residency typically takes about 3 visits.
+- Airport at a fixed distance (user decision): visa = deadline. Overstay = lose all lifetime miles; the run continues (user decision).
+- The airport entrance trigger lands exactly at the planned length: whole chunks only while they fit, plus 6 m filler chunks.
+  If a planned festival would no longer fit, it's placed early.
 - Block obstacles are trigger logic (speed 0 until jump), not physical walls.
 - Run In Background enabled. Input settings asset: background behavior Ignore Focus (needed for MCP-driven tests).
 - Auto Refresh disabled in the editor at the user's request (agents refresh manually).

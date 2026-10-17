@@ -6,7 +6,7 @@
 ## 1. What this is
 A 1-day game jam prototype (UAE jam, theme **"Festival of Passports"**).
 2D endless **auto-runner rogue-lite**, left → right, loosely inspired by *Power Pamplona* (2007). You fly between countries and
-collect **residencies (passports)**. Time spent in a country counts toward residency (**1 in-game year = 1 real minute**;
+collect **residencies (passports)**. Time spent *in* a country (not its airport) counts toward residency (**1 in-game year = 1 real minute**;
 Jam Demo Mode: 1 year = 6 s). An application also needs **3 photos of festivals** in that country (proof of integration).
 **"Menu hell":** timed phone-UI tasks (booking, residency form, duty-free) that you do *while still running*.
 The pursuer is the **departing flight**: miss it and the run ends.
@@ -17,7 +17,11 @@ The pursuer is the **departing flight**: miss it and the run ends.
 3. **Residency application** (foreign airports only, about 2 s after booking, only if years in this country ≥ required): mash to fill the form, then attach 3 photos (mouse: drag; controller: flick the stick right). Timeout or too few photos = fail, so try again on a later visit. Success = passport (saved forever).
 4. **Freezone shop** (phone, every airport): spend miles on one buff. You hold at most one item.
 5. **Airport chase** through crowds to the gate. Terminal length and crowd density scale with the destination's tier.
-6. Reach the gate → **fly** → earn miles (scaled by how long you stayed) → land → **country run** (obstacles, crowds, festivals, pickups) until the visa expires → the level runs into that country's airport → step 2.
+6. Reach the gate → **fly** → earn miles (scaled by how long you stayed) → land → **country run** (obstacles, crowds, pickups,
+   usually **one festival**: 90% one, 5% none, 5% two). The run has a fixed length ending at the country's airport:
+   `visa time × run speed × visaDistanceSlack (0.85)`. The **visa timer is the deadline**. If it hits 0 before you reach the
+   airport, you've **overstayed: all miles are confiscated** (the run continues). Residency time only accrues while in the
+   country on a valid visa, and pauses at airports. → step 2.
 - **Lose:** the flight timer hits 0 → back to the menu. Miles and passports are kept (JSON save).
 - **Win:** own all 10 destination passports (lifetime collection across runs) → win screen with stats.
 
@@ -134,7 +138,8 @@ Assets/_Project/
 ## 8. How to add a country (no code)
 1. Duplicate a `Data/Countries/Country_*.asset`. Set `id` (unique, e.g. `br`), name, palette, tier (1–3),
    required residency years, visa range and festival names.
-2. Optional: make unique chunks by duplicating a chunk prefab in `Prefabs/Chunks/` (e.g. `PF_Chunk_Spain_Bulls`) into a new
+2. Optional: set `signatureFestivalChunk` to a unique festival chunk (its FestivalZone name override is the festival name).
+   Optional: make unique chunks by duplicating a chunk prefab in `Prefabs/Chunks/` (e.g. `PF_Chunk_Spain_Bulls`) into a new
    folder, swapping obstacles, and adding them (with weights) to the country's `chunkPool`. Leave `chunkPool` empty to use the
    generic pool, and `airportChunkPool` empty to use the default airport.
 3. Optional: give it its own `festivalZonePrefab` and `music`.
@@ -143,6 +148,10 @@ Assets/_Project/
 ## 9. How to tune
 - `Data/GameTuning.asset` holds every number: run speed, jump, stumble/crowd multipliers, booking/mash/photo/shop windows, flight timer
   slack, miles, tier tables (obstacle density, crowd density, terminal length), spawn distances and pickup chance.
+- Festivals per visit: `noFestivalChance`, `twoFestivalChance`, `minRunSecondsForTwoFestivals`. They're placed by
+  `FestivalPlanner` (not the random chunk pools): signature chunk first (e.g. La Tomatina), distinct names.
+- Visa deadline: `visaDistanceSlack` (lower = more spare time). `CountryDatabase.fillerChunk` (6 m) lands the airport
+  entrance exactly at the end.
 - **Jam Demo Mode** (`jamDemoMode`, also toggled in the debug panel at runtime): 1 year = 6 s, country run ≤ 30 s, chase ≈ 30 s.
 - Per-obstacle overrides are on the prefab (`SlowObstacle.stumbleMultiplier`, `CrowdZone.speedMultiplier`, `DensityGated.baseChance`).
 - Per-country values are in its `Country_*` asset.
@@ -179,4 +188,5 @@ passports), clear save. The header shows the state, device, years in country and
 - Never commit a non-compiling project. Update **PROGRESS.md** (done / stubbed / bugs / decisions / next tasks) with each commit.
 - Keep scenes thin: put new things in prefabs/ScriptableObjects, not in `Game.unity`.
 - Don't touch `Assets/Art/`.
-- Regenerating assets: `Passport Frenzy/Build Missing Assets` (safe). `Rebuild ALL` only before art exists, or with the artist's agreement.
+- Regenerating assets: `Passport Frenzy/Build Missing Assets` (safe). `Passport Frenzy/Rebuild Data Assets (safe for art)`
+  refills countries, the database and the sound library from code without touching prefabs. `Rebuild ALL` only before art exists, or with the artist's agreement.

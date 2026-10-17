@@ -25,6 +25,17 @@ namespace PassportFrenzy
             RefreshLabel();
         }
 
+        /// <summary>Set by the festival planner so each planned festival in a visit has a distinct name.</summary>
+        public void SetFestivalName(string festivalName)
+        {
+            if (string.IsNullOrEmpty(festivalName)) return;
+            FestivalName = festivalName;
+            RefreshLabel();
+        }
+
+        /// <summary>Name forced by the prefab (signature festivals like "La Tomatina"), or null.</summary>
+        public string NameOverride => string.IsNullOrEmpty(festivalNameOverride) ? null : festivalNameOverride;
+
         public void TakePhoto(RunState run)
         {
             if (Photographed) return;

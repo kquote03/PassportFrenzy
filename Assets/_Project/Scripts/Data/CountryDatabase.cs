@@ -15,6 +15,10 @@ namespace PassportFrenzy
         public WeightedChunk[] defaultAirportChasePool;
 
         [Header("Shared single chunks")]
+        [Tooltip("Festival chunk used for planned festivals (named from the country's festivalNames).")]
+        public Chunk genericFestivalChunk;
+        [Tooltip("Short plain chunk used to land the airport entrance exactly at the end of a country run.")]
+        public Chunk fillerChunk;
         [Tooltip("First chunk after landing in a country.")]
         public Chunk arrivalChunk;
         [Tooltip("End of the country run; its FlowTrigger opens the booking app.")]

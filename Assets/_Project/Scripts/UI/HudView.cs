@@ -82,9 +82,20 @@ namespace PassportFrenzy
 
             countryText.text = c.isHome ? $"HOME: {c.displayName}" : $"{c.displayName.ToUpperInvariant()}  {new string('*', c.difficultyTier)}";
 
-            if (state == GameState.CountryRun)
+            bool inCountry = state is GameState.CountryRun or GameState.ToAirport;
+            if (inCountry && run.VisaOverstayed)
             {
-                visaText.text = $"Visa left: {TimeFormat.Clock(run.VisaSecondsRemaining)}";
+                visaText.text = "<color=#FF5252>VISA OVERSTAYED - miles lost</color>";
+                visaFill.fillAmount = 0f;
+            }
+            else if (inCountry)
+            {
+                // Visa deadline: red when you can't make the airport at full speed any more.
+                float toAirport = root.spawner.AirportX - root.player.transform.position.x;
+                string airport = float.IsNaN(toAirport) ? "" : $"  -  Airport in {Mathf.Max(0, Mathf.CeilToInt(toAirport))} m";
+                bool late = !float.IsNaN(toAirport) && toAirport / T.baseRunSpeed > run.VisaSecondsRemaining;
+                string clock = TimeFormat.Clock(run.VisaSecondsRemaining);
+                visaText.text = late ? $"<color=#FF5252>Visa left: {clock}{airport}</color>" : $"Visa left: {clock}{airport}";
                 visaFill.fillAmount = run.VisaSecondsTotal > 0f ? run.VisaSecondsRemaining / run.VisaSecondsTotal : 0f;
             }
             else
@@ -99,7 +110,8 @@ namespace PassportFrenzy
             {
                 string years = TimeFormat.YearsDecimal(run.SecondsIn(c.id), spy);
                 bool ok = run.IsResidencyEligible(c, spy);
-                residencyText.text = $"Residency: {years}/{c.requiredResidencyYears} yrs{(ok ? "  READY" : "")}";
+                string paused = inCountry ? "" : "  (paused at airport)";
+                residencyText.text = $"Residency: {years}/{c.requiredResidencyYears} yrs{(ok ? "  READY" : paused)}";
             }
 
             photosText.text = c.isHome ? "" : $"Photos here: {run.PhotoCount(c.id)}/{T.photosRequired}";

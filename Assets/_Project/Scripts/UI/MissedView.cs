@@ -18,6 +18,7 @@ namespace PassportFrenzy
             titleText.text = "FLIGHT MISSED!";
             bodyText.text = $"The plane to {destination} left without you.\n\n" +
                             $"This run: {run.CountriesVisited} countries, {run.Photos.Count} photos, +{run.MilesEarned} miles\n" +
+                            (run.MilesLostToOverstay > 0 ? $"Visa overstays cost you {run.MilesLostToOverstay} miles\n" : "") +
                             $"Kept: {SaveSystem.Data.passports.Count} passports, {SaveSystem.Data.miles} miles\n\n" +
                             InputPrompts.Format("{Submit} Back to the home airport");
             float t = 0f;

@@ -83,6 +83,17 @@ namespace PassportFrenzy
             new TierSettings { obstacleDensity = 0.95f, crowdDensity = 0.85f, terminalLength = 320f },
         };
 
+        [Header("Visa deadline")]
+        [Tooltip("Country length = visa seconds x base speed x this. Below 1 leaves spare time for stumbles; "
+                 + "reach the airport before the visa ends or lose all miles.")]
+        [Range(0.3f, 1f)] public float visaDistanceSlack = 0.85f;
+
+        [Header("Festivals per country visit")]
+        [Range(0f, 1f)] public float noFestivalChance = 0.05f;
+        [Range(0f, 1f)] public float twoFestivalChance = 0.05f;
+        [Tooltip("Two festivals are only planned when the country run lasts at least this long.")]
+        public float minRunSecondsForTwoFestivals = 20f;
+
         [Header("Spawning")]
         public float spawnAheadDistance = 40f;
         public float despawnBehindDistance = 30f;
@@ -105,6 +116,9 @@ namespace PassportFrenzy
             float s = visaYears * SecondsPerYear;
             return DemoMode ? Mathf.Min(s, demoCountryRunSeconds) : s;
         }
+
+        /// <summary>World length of a country run; the airport entrance sits at the end.</summary>
+        public float CountryLength(int visaYears) => CountryRunSeconds(visaYears) * baseRunSpeed * visaDistanceSlack;
 
         public TierSettings GetTier(int tier) => tiers[Mathf.Clamp(tier - 1, 0, tiers.Length - 1)];
 
