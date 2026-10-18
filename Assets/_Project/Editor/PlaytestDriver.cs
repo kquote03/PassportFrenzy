@@ -44,10 +44,12 @@ namespace PassportFrenzy.EditorTools
             return new KeyboardState(keys.ToArray());
         }
 
-        static GamepadState Pad(GamepadButton? button = null, Vector2? stick = null)
+        static GamepadState Pad(GamepadButton? button = null, Vector2? stick = null, Vector2? rightStick = null, float rightTrigger = 0f)
         {
             var s = button.HasValue ? new GamepadState(button.Value) : new GamepadState();
             s.leftStick = stick ?? _heldStick;
+            s.rightStick = rightStick ?? Vector2.zero;
+            s.rightTrigger = rightTrigger;
             return s;
         }
 
@@ -117,6 +119,31 @@ namespace PassportFrenzy.EditorTools
             Enqueue(0, () => InputSystem.QueueStateEvent(pad, Pad(stick: dir)));
             Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, Pad()));
             return $"queued flick {dir}";
+        }
+
+        /// <summary>Flick the right stick (phone navigation / photo attach while running).</summary>
+        public static string FlickRightStick(Vector2 dir, int holdFrames = 4)
+        {
+            var pad = VirtualGamepad;
+            Enqueue(0, () => InputSystem.QueueStateEvent(pad, Pad(rightStick: dir)));
+            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, Pad()));
+            return $"queued right flick {dir}";
+        }
+
+        /// <summary>Pull and release the right trigger (phone select / mash).</summary>
+        public static string TapTrigger(int holdFrames = 3)
+        {
+            var pad = VirtualGamepad;
+            Enqueue(0, () => InputSystem.QueueStateEvent(pad, Pad(rightTrigger: 1f)));
+            Enqueue(holdFrames, () => InputSystem.QueueStateEvent(pad, Pad()));
+            return "queued RT";
+        }
+
+        /// <summary>Left-click N times at a screen point (residency form mashing).</summary>
+        public static string MashClick(Vector2 at, int times)
+        {
+            for (int i = 0; i < times; i++) ClickMouse(at);
+            return $"queued {times} clicks at {at}";
         }
 
         public static Mouse VirtualMouse =>

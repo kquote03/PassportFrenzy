@@ -13,8 +13,8 @@ namespace PassportFrenzy
         [SerializeField] Button skipButton;
         [SerializeField] TMP_Text milesText;
         [SerializeField] TMP_Text infoText;
-        [Tooltip("Seconds before the first item is selected for keyboard/controller (mouse works immediately).")]
-        [SerializeField] float selectDelay = 0.5f;
+        [Tooltip("Seconds before the first item is selected for the controller (mouse works immediately).")]
+        [SerializeField] float selectDelay = 0.1f;
 
         bool _done;
 
@@ -40,7 +40,7 @@ namespace PassportFrenzy
             bool selected = false;
             while (!_done && t > 0f)
             {
-                // Grace period so leftover mash presses can't buy the first item by accident.
+                // Short grace period so leftover RT mash presses can't buy the first item by accident.
                 if ((!selected && window - t >= selectDelay) || (selected && UIRoot.NothingSelected))
                 {
                     UIRoot.Select(items.Length > 0 && items[0].gameObject.activeSelf ? items[0].gameObject : skipButton.gameObject);

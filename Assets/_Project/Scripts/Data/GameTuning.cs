@@ -75,6 +75,9 @@ namespace PassportFrenzy
         [Header("Flight")]
         [Tooltip("Extra seconds always added to the flight timer.")]
         public float flightTimerPaddingSeconds = 6f;
+        [Tooltip("Residency/shop run on the phone during the chase. This fraction of their time is added to the flight timer "
+                 + "for the slowdown of juggling the phone while running.")]
+        [Range(0f, 1f)] public float menuOverlapAllowance = 0.4f;
         [Tooltip("Chase time = (terminal / speed) * crowd factor * slack.")]
         public float chaseSlackMultiplier = 1.25f;
         public float flyingScreenSeconds = 2.5f;
@@ -148,5 +151,24 @@ namespace PassportFrenzy
 
         public float ExpectedChaseSeconds(int tier) =>
             TerminalLength(tier) / baseRunSpeed * CrowdTimeFactor(tier) * chaseSlackMultiplier;
+
+        /// <summary>Seconds on the phone after booking (residency form if eligible, then the shop).</summary>
+        public float PhoneSecondsAfterBooking(bool residencyAhead)
+        {
+            float s = shopWindowSeconds;
+            if (residencyAhead) s += residencyDelayAfterBooking + mashWindowSeconds.y + photoAttachSeconds + resultDisplaySeconds;
+            return s;
+        }
+
+        /// <summary>
+        /// Flight timer, started right after booking. The chase starts at once and the phone overlays it, so only
+        /// <see cref="menuOverlapAllowance"/> of the phone time is added on top of the run itself.
+        /// </summary>
+        public float FlightSeconds(int tier, bool residencyAhead)
+        {
+            float lobbyRun = spawnAheadDistance / baseRunSpeed; // safe lobby chunks already spawned ahead of the terminal
+            return lobbyRun + ExpectedChaseSeconds(tier) + menuOverlapAllowance * PhoneSecondsAfterBooking(residencyAhead)
+                   + flightTimerPaddingSeconds;
+        }
     }
 }

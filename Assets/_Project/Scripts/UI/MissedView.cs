@@ -20,7 +20,7 @@ namespace PassportFrenzy
                             $"This run: {run.CountriesVisited} countries, {run.Photos.Count} photos, +{run.MilesEarned} miles\n" +
                             (run.MilesLostToOverstay > 0 ? $"Visa overstays cost you {run.MilesLostToOverstay} miles\n" : "") +
                             $"Kept: {SaveSystem.Data.passports.Count} passports, {SaveSystem.Data.miles} miles\n\n" +
-                            InputPrompts.Format("{Submit} Back to the home airport");
+                            InputPrompts.Format("{Confirm} Back to the home airport");
             float t = 0f;
             var input = GameRoot.I.input;
             while (t < seconds)

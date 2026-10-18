@@ -12,8 +12,8 @@ namespace PassportFrenzy
         [SerializeField] PhoneView phone;
         [SerializeField] BookingCardView[] cards;
         [SerializeField] TMP_Text hintText;
-        [Tooltip("Seconds before the first card is selected for keyboard/controller (mouse works immediately).")]
-        [SerializeField] float selectDelay = 0.35f;
+        [Tooltip("Seconds before the first card is selected for the controller (mouse works immediately).")]
+        [SerializeField] float selectDelay = 0.1f;
 
         public IEnumerator Run(List<BookingOption> options, float window, Action<BookingOption> onPicked)
         {
@@ -34,7 +34,7 @@ namespace PassportFrenzy
             bool selected = false;
             while (chosen == null && t > 0f)
             {
-                // Grace period: leftover Space/A presses (jumping, mashing) must not book instantly.
+                // Short grace period so a held RT from the previous app can't book instantly.
                 if ((!selected && window - t >= selectDelay) || (selected && UIRoot.NothingSelected))
                 {
                     UIRoot.Select(cards[0].gameObject);

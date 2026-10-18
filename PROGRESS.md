@@ -22,6 +22,21 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
 - Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
+## Phone while running (awaiting user playtest)
+- [x] Gameplay stays live while the phone is open (`InputRouter.SetPhoneMode`). New **Phone** action map: right stick navigate,
+  RT select/mash; keyboard players use the mouse only (click, drag, spam left click to mash). Space/Enter/A never touch the phone.
+- [x] Menus overlay the chase: booking in the lobby, then the terminal starts immediately; residency + shop pop up during it.
+  Reaching the gate with the phone open boards anyway. Flight timer = `GameTuning.FlightSeconds` (phone time × 0.4 overlap allowance).
+- Verified via MCP Autopilot:
+  - **Gamepad:** R-stick + RT booked, RT mashed, R-stick flicks attached photos, RT bought in the shop.
+    Mid-shop, the player ran at 8 m/s with jump enabled, the UI module was on Phone/Navigate + Phone/Submit, and the spawner was in Chase mode.
+  - **Keyboard + mouse:** a click booked, left-click spam filled the form, a drag attached 3 photos (India APPROVED), a click bought an item.
+  - Space/Enter taps during booking did not book (it timed out).
+  - Gate trigger mid-shop → Flying with the phone closed.
+  - 16 EditMode tests pass.
+- Risk seen in testing: two bot visits (Japan, Germany) overstayed the visa by a fraction of a second while holding right; free
+  movement plus obstacles leaves little spare time at `visaDistanceSlack` 0.85. To decide in the deadline-tuning step.
+
 ## Post-prototype fixes (after M10)
 - [x] Residency time pauses at airports (and after a visa overstay). The HUD shows "(paused at airport)".
 - [x] Festivals per visit are planned by `FestivalPlanner`: 90% one, 5% none, 5% two (two only on runs ≥ 20 s with distinct
@@ -90,14 +105,15 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Run In Background enabled. Input settings asset: background behavior Ignore Focus (needed for MCP-driven tests).
 - Auto Refresh disabled in the editor at the user's request (agents refresh manually).
 - Removed template `Example.cs` and `SampleScene`. Domain reload on play is disabled in this project, so statics reset via SubsystemRegistration hooks.
-- Mash is Space / A / RT, or clicking the on-screen button (mouse users). Photo attach on keyboard also works with → (Navigate).
+- Phone controls (user decision): keyboard players use the mouse only (spam left click to mash, drag photos); gamepad uses the
+  right stick + RT. Movement/jump keys never touch the phone, so menus can be used while running (menus overlay the chase).
 - Removed the duplicate Gameplay/ToggleDebug and the unused Flick action. Space added to UI/Submit.
-- Flight timer = shop window + (residency budget if eligible) + filler run + expected chase (terminal / speed × crowd factor × slack) + padding.
-  Finishing menus early banks time.
+- Flight timer (starts after booking) = lobby run + expected chase (terminal / speed × crowd factor × slack)
+  + `menuOverlapAllowance` × phone time after booking + padding.
 - Booking excludes the country you're in, unless it's the last unowned one.
 - Fixed: the player Visual used to drift to scale 1 (the feedback lerp targeted Vector3.one). It now returns to its authored scale.
-- Booking and shop wait 0.35 s / 0.5 s before auto-selecting the first entry for keyboard/controller, so leftover
-  jump or mash presses can't book or buy by accident (mouse works immediately).
+- Booking and shop wait 0.1 s before auto-selecting the first entry for the controller, so a held RT can't book or buy by
+  accident (mouse works immediately).
 - Menus re-select their first entry whenever selection is lost (a stray mouse click no longer strands keyboard/controller users).
 - When the collection is complete, Play leads straight to the win screen ("New Collection" resets the save).
 - In demo mode a single 30 s visa (5 years) already satisfies most residency requirements, which keeps the demo loop short.

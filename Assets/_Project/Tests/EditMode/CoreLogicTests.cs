@@ -147,5 +147,18 @@ namespace PassportFrenzy.Tests
             Assert.AreEqual(30f, t.CountryRunSeconds(9), 0.01f);
             Assert.That(t.ExpectedChaseSeconds(3), Is.LessThanOrEqualTo(t.demoChaseSeconds + 0.01f));
         }
+
+        [Test]
+        public void FlightSeconds_PhoneOverlapsTheChase()
+        {
+            var t = ScriptableObject.CreateInstance<GameTuning>();
+            _created.Add(t);
+            float run = t.spawnAheadDistance / t.baseRunSpeed + t.ExpectedChaseSeconds(2) + t.flightTimerPaddingSeconds;
+            // Only the overlap allowance of the phone time is added on top of the run itself.
+            Assert.AreEqual(run + t.menuOverlapAllowance * t.shopWindowSeconds, t.FlightSeconds(2, false), 0.01f);
+            Assert.That(t.FlightSeconds(2, true), Is.GreaterThan(t.FlightSeconds(2, false)));
+            t.menuOverlapAllowance = 0f;
+            Assert.AreEqual(run, t.FlightSeconds(2, true), 0.01f);
+        }
     }
 }

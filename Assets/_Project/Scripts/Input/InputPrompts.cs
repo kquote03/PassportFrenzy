@@ -3,8 +3,9 @@ using System.Text;
 namespace PassportFrenzy
 {
     /// <summary>
-    /// Replaces tokens like {Jump} {Photo} {Use} {Mash} {Submit} {Debug} {Attach}
-    /// with the right key/button name for the last-used device.
+    /// Replaces tokens like {Jump} {Photo} {Use} {Mash} {Submit} {Confirm} {Debug} {Attach}
+    /// with the right key/button name for the last-used device. {Submit}/{Mash}/{Attach}/{PhoneNav} are phone controls
+    /// (used while running); {Confirm} is for full-screen overlay menus.
     /// </summary>
     public static class InputPrompts
     {
@@ -14,10 +15,12 @@ namespace PassportFrenzy
             ("{Jump}", "[Space]", "[A]"),
             ("{Photo}", "[F]", "[X]"),
             ("{Use}", "[E]", "[Y]"),
-            ("{Mash}", "[Space]", "[A]"),
-            ("{Submit}", "[Space/Enter]", "[A]"),
+            ("{Mash}", "[Left Click]", "[RT]"),
+            ("{Submit}", "[Click]", "[RT]"),
+            ("{PhoneNav}", "[Mouse]", "[R-Stick]"),
+            ("{Confirm}", "[Space/Enter]", "[A]"),
             ("{Debug}", "[F1]", "[Select]"),
-            ("{Attach}", "Drag photos onto the paper", "Flick [L-Stick] right"),
+            ("{Attach}", "Drag photos onto the paper", "Flick [R-Stick] right"),
         };
 
         public static string Format(string template)

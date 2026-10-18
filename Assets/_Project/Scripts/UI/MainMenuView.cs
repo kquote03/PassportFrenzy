@@ -14,7 +14,7 @@ namespace PassportFrenzy
         [SerializeField] TMP_Text controlsText;
 
         string ControlsTemplate => (GameRoot.I != null && !GameRoot.I.tuning.autoRun ? "{Move} Move    " : "")
-                                   + "{Jump} Jump    {Photo} Photo    {Use} Use item    {Debug} Debug";
+                                   + "{Jump} Jump    {Photo} Photo    {Use} Use item    {PhoneNav} {Submit} Phone    {Debug} Debug";
 
         void Awake()
         {

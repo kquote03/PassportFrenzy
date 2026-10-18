@@ -13,10 +13,13 @@ The pursuer is the **departing flight**: miss it and the run ends.
 
 ### Game loop
 1. **Home airport (UAE) = main menu.** Play → the character runs through the airport door.
-2. **Booking app** (phone): 3 random unowned destinations, each with a random visa (`5 years (5 min)`). Pick within about 5 s or a random one is booked for you. The **flight timer** starts.
-3. **Residency application** (foreign airports only, about 2 s after booking, only if years in this country ≥ required): mash to fill the form, then attach 3 photos (mouse: drag; controller: flick the stick right). Timeout or too few photos = fail, so try again on a later visit. Success = passport (saved forever).
+   **The phone is used while running** (you keep moving and jumping). Booking happens in the obstacle-free lobby; right after
+   booking the **terminal chase starts** and steps 3–4 pop up on the phone while you dodge crowds and obstacles.
+2. **Booking app** (phone): 3 random unowned destinations, each with a random visa (`5 years (5 min)`). Pick within about 5 s or a random one is booked for you. The **flight timer** starts and the terminal begins.
+3. **Residency application** (foreign airports only, about 2 s after booking, only if years in this country ≥ required): mash to fill the form (spam left click / RT), then attach 3 photos (mouse: drag; controller: flick the right stick right). Timeout or too few photos = fail, so try again on a later visit. Success = passport (saved forever).
 4. **Freezone shop** (phone, every airport): spend miles on one buff. You hold at most one item.
-5. **Airport chase** through crowds to the gate. Terminal length and crowd density scale with the destination's tier.
+5. **Airport chase** through crowds to the gate (already running since booking). Terminal length and crowd density scale with the destination's tier.
+   Reaching the gate with the phone still open boards anyway (the app is abandoned).
 6. Reach the gate → **fly** → earn miles (scaled by how long you stayed) → land → **country run** (obstacles, crowds, pickups,
    usually **one festival**: 90% one, 5% none, 5% two). The run has a fixed length ending at the country's airport:
    `visa time × run speed × visaDistanceSlack (0.85)`. The **visa timer is the deadline**. If it hits 0 before you reach the
@@ -32,12 +35,14 @@ The pursuer is the **departing flight**: miss it and the run ends.
 | Jump | Space / W / ↑ | A (South) |
 | Photo | F / right mouse | X (West) |
 | Use item | E / Q | Y (North) |
-| Menu navigate / confirm | Arrows/WASD, Space/Enter, mouse | Stick/D-pad, A |
-| Mash (residency form) | Space or click the button | A / RT |
-| Attach photo | Drag onto paper | Flick stick right |
+| Phone navigate / select (while running) | Mouse only (click) | Right stick, RT |
+| Mash (residency form) | Spam left click (anywhere) | RT |
+| Attach photo | Drag onto paper | Flick right stick right |
+| Overlay menus (home, missed, win) navigate / confirm | Arrows/WASD, Space/Enter, mouse | Stick/D-pad, A |
 | Debug panel | F1 | Select |
 
-While any phone menu is open the **Gameplay** action map is disabled (no jump), and the world spawns only obstacle-free chunks.
+The phone never uses the movement/jump controls, so you can run and use it at the same time. Full-screen overlays (home,
+flying, missed, won) still disable the Gameplay map.
 
 ### Movement
 No auto-scroll: **move with A/D or ←/→, the left stick, or the D-pad** (W/↑/Space/A jump). Adopted on `main` after the
@@ -90,7 +95,7 @@ Assets/_Project/
   Editor/             PrototypeBuilder (generates placeholder sprites, data assets, prefabs, scene)
   Tests/EditMode/     Pure-logic tests (RunState, booking, time format, save, weighted pick, tuning)
   Data/               GameTuning.asset, CountryDatabase.asset, SoundLibrary.asset, Countries/, Buffs/
-  Input/              PassportFrenzyControls.inputactions (maps: Gameplay, UI; schemes: KeyboardMouse, Gamepad)
+  Input/              PassportFrenzyControls.inputactions (maps: Gameplay, UI, Phone; schemes: KeyboardMouse, Gamepad)
   Placeholder/Sprites Generated white shapes (Square, Circle, Triangle, Capsule), tinted per object
   Prefabs/            Core, Player, Chunks/{Generic,Airport,Home,Spain,Japan,India}, Obstacles, Festivals, Pickups, UI
   Scenes/Game.unity
@@ -105,7 +110,7 @@ Assets/_Project/
 - **RunState** is plain C# data for one run (current/destination country, seconds per country, photos, held item, timers, stats).
 - **SaveSystem / SaveData** hold lifetime data: miles, owned passports, counters. Saved on every change.
 - **ChunkSpawner** streams `Chunk` prefabs ahead of the player and destroys them behind. Modes: `Home`, `Country`
-  (weighted country pool), `AirportSafe` (obstacle-free filler while phones are open), `Chase` (airport pool for the terminal
+  (weighted country pool), `AirportSafe` (obstacle-free airport lobby, e.g. during booking), `Chase` (airport pool for the terminal
   length, then the gate). One-off chunks (door, airport entrance, freezone, gate) go through `EnqueueOnce`.
 - **Chunk children opt into behaviour** with components: `PaletteTint` (country colors), `DensityGated` (tier thins obstacles/crowds),
   `PickupSocket` (rare buff), `FestivalZone` (photo op), `FlowTrigger` (door / airport entrance / gate).
@@ -114,8 +119,11 @@ Assets/_Project/
 - **Buffs** are ScriptableObjects (`BuffDefinition` subclasses). Passive ones (Shield) apply on acquire; others go into the single item slot.
   The same assets serve the shop and pickups.
 - **UI** uses uGUI prefabs. HUD and FlightBoard poll state each frame. Phone apps are coroutines that GameFlow `yield return`s on.
-- **Input**: `InputRouter` exposes actions; `SetMenuMode(true)` disables the Gameplay map. `InputDeviceTracker` + `InputPrompts`
-  produce device-correct prompt text (`"{Jump} Jump"` → `[Space] Jump` / `[A] Jump`).
+- **Input**: `InputRouter` exposes actions. Maps: Gameplay, UI (overlay menus), **Phone** (`Navigate` = right stick,
+  `Submit` = RT, `Mash` = RT / left mouse). `SetMenuMode(true)` disables the Gameplay map (full-screen overlays only).
+  `SetPhoneMode(true)` keeps Gameplay live and swaps the EventSystem's `InputSystemUIInputModule.move/submit` to the Phone
+  actions (mouse point/click are untouched). `InputDeviceTracker` + `InputPrompts` produce device-correct prompt text
+  (`"{Jump} Jump"` → `[Space] Jump` / `[A] Jump`; phone tokens `{Submit}` `{Mash}` `{PhoneNav}` `{Attach}`; overlays use `{Confirm}`).
 - **Audio**: `AudioManager.Play(SoundIds.X)` and `PlayMusic(country)`. Every hook is a no-op until a clip is assigned in
   `Data/SoundLibrary.asset` (or `CountryDefinition.music`).
 - **Events**: `GameEvents` (static) for UI/audio feedback only: toast, photo taken, hit, item changed, passport, miles.
@@ -162,6 +170,8 @@ Assets/_Project/
   slack, miles, tier tables (obstacle density, crowd density, terminal length), spawn distances and pickup chance.
 - Festivals per visit: `noFestivalChance`, `twoFestivalChance`, `minRunSecondsForTwoFestivals`. They're placed by
   `FestivalPlanner` (not the random chunk pools): signature chunk first (e.g. La Tomatina), distinct names.
+- Flight timer: `GameTuning.FlightSeconds(tier, residencyAhead)` = lobby run + expected chase + `menuOverlapAllowance` (0.4) ×
+  phone time after booking + padding (the phone overlaps the chase, so only part of its time is added).
 - Visa deadline: `visaDistanceSlack` (lower = more spare time). `CountryDatabase.fillerChunk` (6 m) lands the airport
   entrance exactly at the end.
 - **Jam Demo Mode** (`jamDemoMode`, also toggled in the debug panel at runtime): 1 year = 6 s, country run ≤ 30 s, chase ≈ 30 s.
@@ -181,7 +191,9 @@ passports), clear save. The header shows the state, device, years in country and
   the Game view*, so injected input works while unfocused.
 - **Use `PassportFrenzy.EditorTools.PlaytestDriver`** (MCP eval) to press keys and buttons, e.g.
   `PlaytestDriver.TapKey(UnityEngine.InputSystem.Key.Space)`, `PlaytestDriver.TapPad(UnityEngine.InputSystem.LowLevel.GamepadButton.South)`,
-  `PlaytestDriver.FlickStick(new UnityEngine.Vector2(1,0))`. It injects on virtual devices inside the game's own input update.
+  `PlaytestDriver.FlickStick(new UnityEngine.Vector2(1,0))`, `FlickRightStick(...)`, `TapTrigger()` (RT), `ClickMouse(screenPos)`,
+  `DragMouse(from, to)`. It injects on virtual devices inside the game's own input update.
+  The Autopilot uses the phone like a player would: gamepad = right stick + RT; keyboard mode = mouse clicks, left-click mashing, drags.
   MCP `simulate_key` (and events queued straight from eval) get processed in the *editor* input update, which gameplay never sees.
 - `PlaytestDriver.Prepare()` also sets `Time.captureDeltaTime = 1/30`, so game time advances per frame (deterministic even at
   a few fps while unfocused). It's reset when Play mode exits.

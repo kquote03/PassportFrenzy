@@ -7,7 +7,8 @@ namespace PassportFrenzy
     /// The game loop:
     /// Home -> Departing -> [Booking -> Residency? -> Shop] -> Chase -> Flying -> CountryRun -> ToAirport -> [Booking ...]
     /// Missing the flight (flight timer hits 0) -> Missed -> Home. Owning every destination passport -> Won.
-    /// The bracketed airport part is one coroutine (<see cref="AirportSequence"/>).
+    /// The bracketed airport part is one coroutine (<see cref="AirportSequence"/>). The phone is used while running:
+    /// booking happens in the lobby, then the terminal chase starts and the residency form + shop overlay it.
     /// </summary>
     public class GameFlow : MonoBehaviour
     {
@@ -39,7 +40,7 @@ namespace PassportFrenzy
             Run = null;
             var home = R.countries.home;
             R.ui.HideOverlays();
-            R.ui.phone.Close();
+            ClosePhone();
             R.spawner.ResetWorld(SpawnMode.Home, home, 1, R.countries.homeLobbyChunk);
             R.player.ResetTo(playerStart);
             R.player.SetRunning(false);
@@ -105,7 +106,14 @@ namespace PassportFrenzy
                 case FlowTriggerId.AirportEntrance when State is GameState.CountryRun or GameState.ToAirport:
                     _sequence = StartCoroutine(AirportSequence());
                     break;
-                case FlowTriggerId.Gate when State == GameState.Chase:
+                case FlowTriggerId.Gate when State is GameState.Chase or GameState.Residency or GameState.Shop:
+                    if (State != GameState.Chase)
+                    {
+                        // Reached the gate with the phone still open: board anyway, the app is abandoned.
+                        StopSequence();
+                        ClosePhone();
+                        GameEvents.RaiseToast("Boarded! Phone closed");
+                    }
                     _sequence = StartCoroutine(FlySequence());
                     break;
             }
@@ -140,10 +148,10 @@ namespace PassportFrenzy
         IEnumerator AirportSequence()
         {
             var here = Run.Current;
-            R.input.SetMenuMode(true);
+            R.input.SetPhoneMode(true); // keep running: phone on the right stick + RT, or the mouse
             R.player.GetComponent<PlayerInteractions>().ClearZone();
 
-            // 1. Booking (menu hell: pick within the window or get a random one)
+            // 1. Booking in the lobby (menu hell: pick within the window or get a random one)
             SetState(GameState.Booking);
             var options = BookingRules.PickOptions(R.countries.destinations, SaveSystem.Data.passports,
                 here.isHome ? null : here, T.bookingChoices, _rng);
@@ -160,7 +168,12 @@ namespace PassportFrenzy
             bool eligible = !here.isHome && !owned && Run.IsResidencyEligible(here, T.SecondsPerYear);
             StartFlightTimer(eligible);
 
-            // 2. Residency application (foreign airports only, once per visit)
+            // 2. The terminal chase starts now; residency and shop pop up on the phone while you run it.
+            int tier = Run.Destination.difficultyTier;
+            R.spawner.BeginChase(here, tier, T.TerminalLength(tier));
+            GameEvents.RaiseToast($"Run to the gate! Flight to {Run.Destination.displayName}");
+
+            // 3. Residency application (foreign airports only, once per visit)
             if (!here.isHome && !owned)
             {
                 if (eligible)
@@ -183,30 +196,26 @@ namespace PassportFrenzy
                 }
             }
 
-            // 3. Freezone shop
+            // 4. Freezone shop (still running)
             SetState(GameState.Shop);
             R.spawner.EnqueueOnce(R.countries.freezoneChunk);
             yield return R.ui.phone.shop.Run(T.shopWindowSeconds);
-            R.ui.phone.Close();
+            ClosePhone();
 
-            // 4. Chase to the gate
-            R.input.SetMenuMode(false);
-            int tier = Run.Destination.difficultyTier;
-            R.spawner.BeginChase(here, tier, T.TerminalLength(tier));
+            // 5. Phone away: just the run to the gate
             SetState(GameState.Chase);
-            GameEvents.RaiseToast($"Run to the gate! Flight to {Run.Destination.displayName}");
             _sequence = null;
+        }
+
+        void ClosePhone()
+        {
+            R.ui.phone.Close();
+            R.input.SetPhoneMode(false);
         }
 
         void StartFlightTimer(bool residencyAhead)
         {
-            int tier = Run.Destination.difficultyTier;
-            float menus = T.shopWindowSeconds;
-            if (residencyAhead)
-                menus += T.residencyDelayAfterBooking + T.mashWindowSeconds.y + T.photoAttachSeconds + T.resultDisplaySeconds * 2f;
-            float fillerRun = T.spawnAheadDistance / T.baseRunSpeed; // safe chunks already spawned ahead of the chase
-            float total = menus + fillerRun + T.ExpectedChaseSeconds(tier) + T.flightTimerPaddingSeconds;
-            Run.FlightSecondsTotal = Run.FlightSecondsRemaining = total;
+            Run.FlightSecondsTotal = Run.FlightSecondsRemaining = T.FlightSeconds(Run.Destination.difficultyTier, residencyAhead);
             Run.FlightTimerActive = true;
         }
 
@@ -216,6 +225,7 @@ namespace PassportFrenzy
         {
             SetState(GameState.Flying);
             Run.FlightTimerActive = false;
+            R.input.SetPhoneMode(false);
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);
 
@@ -265,7 +275,7 @@ namespace PassportFrenzy
             Run.FlightTimerActive = false;
             Run.FlightSecondsRemaining = 0f;
             SetState(GameState.Missed);
-            R.ui.phone.Close();
+            ClosePhone();
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);
             R.audioManager.Play(SoundIds.FlightMissed);
@@ -295,7 +305,7 @@ namespace PassportFrenzy
             if (Run != null) Run.FlightTimerActive = false;
             SetState(GameState.Won);
             R.ui.HideOverlays();
-            R.ui.phone.Close();
+            ClosePhone();
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);
             R.audioManager.Play(SoundIds.Win);

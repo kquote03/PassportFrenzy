@@ -9,8 +9,9 @@ namespace PassportFrenzy
 {
     /// <summary>
     /// Residency application (menu hell):
-    /// 1) mash to fill in the form within a random window,
-    /// 2) attach N festival photos from the tray to the paper (mouse: drag; controller: flick stick right).
+    /// 1) mash to fill in the form within a random window (spam left click anywhere, or RT),
+    /// 2) attach N festival photos from the tray to the paper (mouse: drag; controller: flick the right stick right).
+    /// Runs on the phone while the player keeps running the terminal.
     /// Fails on timeout or when the player runs out of photos.
     /// </summary>
     public class ResidencyApp : MonoBehaviour
@@ -38,15 +39,13 @@ namespace PassportFrenzy
         [SerializeField] TMP_Text stampText;
 
         readonly List<PhotoDragItem> _items = new List<PhotoDragItem>();
-        int _clicks, _attached;
+        int _attached;
 
         /// <summary>Current step (read by tests/automation).</summary>
         public Phase CurrentPhase { get; private set; }
         public int AttachedCount => _attached;
 
         public RectTransform DragLayer => (RectTransform)GetComponentInParent<Canvas>().rootCanvas.transform;
-
-        void Awake() => mashButton.onClick.AddListener(() => _clicks++);
 
         public IEnumerator Run(CountryDefinition country, List<PhotoRecord> photos, Action<bool> done)
         {
@@ -63,15 +62,13 @@ namespace PassportFrenzy
             int target = UnityEngine.Random.Range(T.mashPressesRange.x, T.mashPressesRange.y + 1);
             float window = UnityEngine.Random.Range(T.mashWindowSeconds.x, T.mashWindowSeconds.y);
             int presses = 0;
-            _clicks = 0;
             float t = window;
             while (presses < target && t > 0f)
             {
-                if (input.Mash.WasPressedThisFrame()) { presses++; GameRoot.I.audioManager.Play(SoundIds.Mash); }
-                presses += _clicks;
-                _clicks = 0;
+                // PhoneMash = RT or any left click (the on-screen button is just a target, so clicks aren't counted twice).
+                if (input.PhoneMash.WasPressedThisFrame()) { presses++; GameRoot.I.audioManager.Play(SoundIds.Mash); }
                 mashFill.fillAmount = presses / (float)target;
-                mashText.text = InputPrompts.Format($"Fill in the form!\nMash {{Mash}} or click\n<size=150%>{Mathf.Min(presses, target)}/{target}</size>");
+                mashText.text = InputPrompts.Format($"Fill in the form!\nMash {{Mash}}\n<size=150%>{Mathf.Min(presses, target)}/{target}</size>");
                 t -= Time.deltaTime;
                 phone.SetTimer(t / window, t);
                 yield return null;
@@ -108,8 +105,8 @@ namespace PassportFrenzy
                     yield break;
                 }
 
-                // Controller / keyboard: flick the stick from the tray (left) toward the paper (right).
-                float x = input.Navigate.ReadValue<Vector2>().x;
+                // Controller: flick the right stick from the tray (left) toward the paper (right). Mouse: drag.
+                float x = input.PhoneNavigate.ReadValue<Vector2>().x;
                 if (flickArmed && x > 0.7f) { AttachNext(); flickArmed = false; }
                 else if (x < 0.3f) flickArmed = true;
 
