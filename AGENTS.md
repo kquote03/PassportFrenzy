@@ -2,6 +2,7 @@
 
 > Read this first. It's the shared context for humans **and** AI agents (Claude Code loads it through `CLAUDE.md`).
 > Current status, known bugs and next tasks are in **PROGRESS.md**. Keep both files up to date with every commit.
+> Picking up mid-stream? Read **HANDOFF.md** first (what to verify, next tasks in order).
 
 ## 1. What this is
 A 1-day game jam prototype (UAE jam, theme **"Festival of Passports"**).

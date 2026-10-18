@@ -14,7 +14,7 @@ namespace PassportFrenzy
         [SerializeField] TMP_Text controlsText;
 
         string ControlsTemplate => (GameRoot.I != null && !GameRoot.I.tuning.autoRun ? "{Move} Move    " : "")
-                                   + "{Jump} Jump    {Photo} Photo    {Use} Use item    {PhoneNav} {Submit} Phone    {Debug} Debug";
+                                   + "{Jump} Jump    {Photo} Photo    {Use} Use item    {PhoneControls} Phone    {Debug} Debug";
 
         void Awake()
         {
@@ -32,9 +32,9 @@ namespace PassportFrenzy
             var db = GameRoot.I.countries;
             var d = SaveSystem.Data;
             var sb = new StringBuilder();
-            sb.AppendLine($"Passports: {d.passports.Count}/{db.destinations.Count}     Miles: {d.miles}");
+            sb.AppendLine($"<b>Passports: {d.passports.Count}/{db.destinations.Count}     Miles: {d.miles}</b>");
             foreach (var c in db.destinations)
-                if (c != null) sb.Append(d.Owns(c.id) ? $"<color=#2a8a2a>[{c.displayName}]</color> " : $"<color=#888888>{c.displayName}</color> ");
+                if (c != null) sb.Append(d.Owns(c.id) ? $"<color=#1F7A78><b>[{c.displayName}]</b></color> " : $"<color=#6B7787>{c.displayName}</color> ");
             statsText.text = sb.ToString();
             controlsText.text = InputPrompts.Format(ControlsTemplate);
             UIRoot.Select(playButton.gameObject);

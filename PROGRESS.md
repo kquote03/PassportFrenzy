@@ -22,6 +22,16 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
 - Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
+## Airport UI restyle (awaiting user playtest; see HANDOFF.md "Verify first")
+- [x] Every screen is rebuilt by `Editor/PrototypeBuilder.UI.cs` (menu `Rebuild UI Prefabs (safe for world art)`), with rounded
+  9-sliced sprites from `Generate UI Sprites` (`Placeholder/UI/`).
+- Palette: navy #13213A, teal #1F7A78, paper #FFF8EA, sand #F3E5C8, gold #F4B43A, coral #E5534B.
+- Screens: boarding-pass booking cards, duty-free tag shop items, polaroid photos + tilted stamp, departures-board flight
+  board, pill buttons with a pulsing gold selection outline (`SelectionHighlight`).
+- Checked at 16:9 only. Subagent's clean keyboard + mouse Play session had 0 errors; the gamepad loop worked.
+- Not compiled yet: the FlightBoard shows the gate countdown during phone apps, and the `{PhoneControls}` menu token.
+- Known: the debug panel wraps the long save path; `Game.unity` has suspicious local UI overrides (not pushed).
+
 ## Placeholder sound effects (awaiting user playtest)
 - [x] All 17 SFX hooks in `Data/SoundLibrary.asset` have generated clips (`Assets/_Project/Placeholder/Audio/SFX/<id>.wav`,
   16-bit mono 44.1 kHz). Examples: airport "ding-dong-ding" chime for booking, rubber-stamp thump, buzzer for rejected,

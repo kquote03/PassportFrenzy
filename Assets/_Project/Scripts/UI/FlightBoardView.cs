@@ -41,7 +41,8 @@ namespace PassportFrenzy
             planeIcon.anchoredPosition = new Vector2(Mathf.Lerp(0f, width, planeT), planeIcon.anchoredPosition.y);
 
             var spawner = root.spawner;
-            if (root.flow.State == GameState.Chase && !float.IsNaN(spawner.ChaseStartX))
+            // The terminal chase starts right after booking; residency and shop run on the phone during it.
+            if (spawner.Mode == SpawnMode.Chase && !float.IsNaN(spawner.ChaseStartX))
             {
                 float px = root.player.transform.position.x;
                 float gate = spawner.PlannedGateX;
@@ -53,7 +54,7 @@ namespace PassportFrenzy
             }
             else
             {
-                distanceText.text = "Finish your phone tasks!";
+                distanceText.text = "Book your flight!";
                 runnerIcon.gameObject.SetActive(false);
             }
         }

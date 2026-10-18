@@ -18,6 +18,7 @@ namespace PassportFrenzy
             ("{Mash}", "[Left Click]", "[RT]"),
             ("{Submit}", "[Click]", "[RT]"),
             ("{PhoneNav}", "[Mouse]", "[R-Stick]"),
+            ("{PhoneControls}", "[Mouse]", "[R-Stick]+[RT]"),
             ("{Confirm}", "[Space/Enter]", "[A]"),
             ("{Debug}", "[F1]", "[Select]"),
             ("{Attach}", "Drag photos onto the paper", "Flick [R-Stick] right"),
