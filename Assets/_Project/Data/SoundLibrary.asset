@@ -14,55 +14,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.SoundLibrary
   entries:
   - id: jump
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: ec2d1ce9b85ac1c468df11846985298b, type: 3}
     volume: 1
   - id: hit
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 371cce6590379714ebc4d4879cb67d7e, type: 3}
     volume: 1
   - id: block
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3116ccbd63d6a0543b28bfb8748ae978, type: 3}
     volume: 1
   - id: shield_break
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a323f36753c3caf41b81e7daa7ad7fbc, type: 3}
     volume: 1
   - id: photo
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b4526d6c72b231f47b5d2001b94ea0fc, type: 3}
     volume: 1
   - id: pickup
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: da29557bf7f3147429e13cfa23fbc70b, type: 3}
     volume: 1
   - id: use_item
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a796bf44060de594cbddf6512200a3c1, type: 3}
     volume: 1
   - id: booking
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5a06da92beef0ac4dbd2a00683b50a69, type: 3}
     volume: 1
   - id: phone_open
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c24304df3b6007440851039d4a04017f, type: 3}
     volume: 1
   - id: mash
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 216cabc4d3b3914438f8c1bbd9e13a23, type: 3}
     volume: 1
   - id: stamp
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b1f9c2f7de870ac468c9a2ef9a560f60, type: 3}
     volume: 1
   - id: rejected
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c375e6d09cb5e1b43a44943f77b6c126, type: 3}
     volume: 1
   - id: buy
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c42a138c5291b634fa78585056f7fd3b, type: 3}
     volume: 1
   - id: takeoff
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0208e0db98e434844ba11f66453e2802, type: 3}
     volume: 1
   - id: flight_missed
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7a3efc7789ddae847ad013e399fbb131, type: 3}
     volume: 1
   - id: visa_overstay
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f411471df75ad1b44bbe4ddf58f2b4d4, type: 3}
     volume: 1
   - id: win
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bd3d4e5d0a0462d49b4bb943a848e85a, type: 3}
     volume: 1
   - id: music_ae
     clip: {fileID: 0}

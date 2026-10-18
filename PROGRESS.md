@@ -22,7 +22,14 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
 - Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
-## Player running animation (artist art, awaiting user playtest)
+## Placeholder sound effects (awaiting user playtest)
+- [x] All 17 SFX hooks in `Data/SoundLibrary.asset` have generated clips (`Assets/_Project/Placeholder/Audio/SFX/<id>.wav`,
+  16-bit mono 44.1 kHz). Examples: airport "ding-dong-ding" chime for booking, rubber-stamp thump, buzzer for rejected,
+  "ka-ching" for buy, jet spool-up for takeoff, sad trombone for a missed flight, hi-lo alarm for visa overstay, fanfare for the win.
+- Regenerate with `python Tools/sfx/generate_sfx.py` (Python standard library only, deterministic). Levels are balanced
+  (peaks about -3 dBFS, quieter for the jump/mash/alarm sounds). Music hooks (`music_<countryId>`) are still empty.
+
+## Player running animation (done, pushed)
 - [x] `PF_Player/Visual` plays the artist's 14-frame cycle from `Assets/Art/RunningAnimation` (read-only: no files or import
   settings in `Assets/Art` were changed). The artist's importer auto-sliced each frame into uneven pieces, so the new
   `SpriteFrameAnimator` builds one full-frame sprite per texture at runtime with a shared pivot at the feet (no jitter).
