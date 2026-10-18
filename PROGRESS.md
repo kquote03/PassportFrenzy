@@ -22,6 +22,19 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
 - Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
+## Player running animation (artist art, awaiting user playtest)
+- [x] `PF_Player/Visual` plays the artist's 14-frame cycle from `Assets/Art/RunningAnimation` (read-only: no files or import
+  settings in `Assets/Art` were changed). The artist's importer auto-sliced each frame into uneven pieces, so the new
+  `SpriteFrameAnimator` builds one full-frame sprite per texture at runtime with a shared pivot at the feet (no jitter).
+- Playback: 24 fps at base speed (the art is on twos, so 12 poses/s), scaled by run speed. It holds frame 1 when standing
+  and frame 9 (the leap) in the air.
+- Placeholder capsule parts (Head, Eye, Backpack, Passport) are disabled. Procedural bob/lean is off. Facing flip, jump squash,
+  hit flash and boost tint still act on the Visual.
+- Tune on the component: `pixelsPerUnit` (size, now 125: about 3.3 × 3.2 units per frame), `pivot` (foot height),
+  `framesPerSecond`, `idleFrame`, `airborneFrame`.
+- Known: the frames are uncoloured line art with transparent insides, so the body shows the backdrop through it and reads
+  weakly on busy scenes. That's for the artist (fill colour) or a generated silhouette fill outside `Assets/Art`.
+
 ## Airport backdrop (placeholder art, awaiting user playtest)
 - [x] The user's generated, horizontally tileable `Placeholder/airport-main-section-scrollable.png` (1536×1024, imported at
   64 PPU = 24 × 16 units, one copy per 24-unit chunk) is the `Backdrop/Wall` sprite of the indoor airport chunks:
