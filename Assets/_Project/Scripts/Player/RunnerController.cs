@@ -27,7 +27,7 @@ namespace PassportFrenzy
         float _boostTimer, _boostMultiplier = 1f;
         float _invulnTimer, _coyoteTimer, _jumpBufferTimer;
         float _flashTimer, _runPhase;
-        float _moveX, _facing = 1f, _furthestX, _leftLimit;
+        float _moveX, _autoMoveX, _facing = 1f, _furthestX, _leftLimit;
         Vector3 _visualBasePos, _visualBaseScale = Vector3.one;
         SpriteRenderer _visualRenderer;
         Color _visualBaseColor = Color.white;
@@ -82,7 +82,12 @@ namespace PassportFrenzy
             _boostTimer = 0f;
             _invulnTimer = 0f;
             _jumpBufferTimer = 0f;
+            _autoMoveX = 0f;
         }
+
+        /// <summary>Scripted move input (-1..1) that drives the runner while player input is locked, e.g. the intro.
+        /// 0 hands movement back to the player.</summary>
+        public void SetAutoMove(float x) => _autoMoveX = Mathf.Clamp(x, -1f, 1f);
 
         public void ClearRunBuffs()
         {
@@ -94,7 +99,7 @@ namespace PassportFrenzy
         {
             var input = GameRoot.I.input;
             if (input.Jump.WasPressedThisFrame()) _jumpBufferTimer = T.jumpBufferTime;
-            _moveX = Running && !input.MenuMode ? input.Move.ReadValue<Vector2>().x : 0f;
+            _moveX = _autoMoveX != 0f ? _autoMoveX : Running && !input.MenuMode ? input.Move.ReadValue<Vector2>().x : 0f;
             if (Mathf.Abs(_moveX) < 0.2f) _moveX = 0f;
 
             float dt = Time.deltaTime;

@@ -21,6 +21,53 @@ namespace PassportFrenzy.Tests
             return c;
         }
 
+        CountryDatabase Database(bool demoOnly, List<CountryDefinition> all, List<CountryDefinition> demo)
+        {
+            var db = ScriptableObject.CreateInstance<CountryDatabase>();
+            db.destinations = all;
+            db.demoDestinations = demo;
+            db.demoRotationOnly = demoOnly;
+            _created.Add(db);
+            return db;
+        }
+
+        [Test]
+        public void DemoRotation_LimitsActiveDestinations_AndCountsOnlyThoseOwned()
+        {
+            var us = Country("us"); var jp = Country("jp"); var ind = Country("in"); var fr = Country("fr");
+            var all = new List<CountryDefinition> { us, jp, ind, fr };
+            var demo = new List<CountryDefinition> { us, jp, ind };
+            var save = new SaveData();
+            save.passports.Add("fr");
+            save.passports.Add("jp");
+
+            var on = Database(true, all, demo);
+            CollectionAssert.AreEqual(demo, on.ActiveDestinations);
+            Assert.AreEqual(1, on.CountOwned(save)); // the French passport is outside the rotation
+
+            var off = Database(false, all, demo);
+            CollectionAssert.AreEqual(all, off.ActiveDestinations);
+            Assert.AreEqual(2, off.CountOwned(save));
+
+            var empty = Database(true, all, new List<CountryDefinition>());
+            CollectionAssert.AreEqual(all, empty.ActiveDestinations); // an empty demo list falls back to everything
+        }
+
+        [Test]
+        public void DemoRotation_BookingFromADemoCountry_OffersTheOtherTwo()
+        {
+            var us = Country("us"); var jp = Country("jp"); var ind = Country("in");
+            var demo = new List<CountryDefinition> { us, jp, ind };
+            for (int seed = 0; seed < 20; seed++)
+            {
+                var opts = BookingRules.PickOptions(demo, new List<string>(), jp, 3, new System.Random(seed));
+                Assert.AreEqual(2, opts.Count);
+                Assert.IsFalse(opts.Exists(o => o.country == jp));
+            }
+            var fromHome = BookingRules.PickOptions(demo, new List<string>(), Country("ae", home: true), 3, new System.Random(3));
+            Assert.AreEqual(3, fromHome.Count);
+        }
+
         [TearDown]
         public void TearDown()
         {

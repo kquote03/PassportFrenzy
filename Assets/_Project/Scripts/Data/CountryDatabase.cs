@@ -10,8 +10,12 @@ namespace PassportFrenzy
         public CountryDefinition home;
         public List<CountryDefinition> destinations = new List<CountryDefinition>();
 
-        [Header("Shared fallback chunk pools")]
-        public WeightedChunk[] genericChunkPool;
+        [Header("Demo")]
+        [Tooltip("Only the demo destinations can be booked, and owning them all wins. Off = every destination.")]
+        public bool demoRotationOnly = true;
+        public List<CountryDefinition> demoDestinations = new List<CountryDefinition>();
+
+        [Header("Shared fallback chunk pools")]        public WeightedChunk[] genericChunkPool;
         public WeightedChunk[] defaultAirportChasePool;
 
         [Header("Shared single chunks")]
@@ -37,6 +41,18 @@ namespace PassportFrenzy
         [Header("Shared prefabs")]
         public BuffPickup pickupPrefab;
         public FestivalZone defaultFestivalZonePrefab;
+
+        /// <summary>Destinations in play: the demo rotation when it is on (and filled in), otherwise all of them.</summary>
+        public IList<CountryDefinition> ActiveDestinations =>
+            demoRotationOnly && demoDestinations != null && demoDestinations.Count > 0 ? demoDestinations : destinations;
+
+        /// <summary>Owned passports among the active destinations (a save may hold passports from outside the rotation).</summary>
+        public int CountOwned(SaveData data)
+        {
+            int n = 0;
+            foreach (var c in ActiveDestinations) if (c != null && data.Owns(c.id)) n++;
+            return n;
+        }
 
         public CountryDefinition GetById(string id)
         {

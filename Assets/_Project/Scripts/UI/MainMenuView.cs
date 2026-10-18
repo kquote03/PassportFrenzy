@@ -32,8 +32,8 @@ namespace PassportFrenzy
             var db = GameRoot.I.countries;
             var d = SaveSystem.Data;
             var sb = new StringBuilder();
-            sb.AppendLine($"<b>Passports: {d.passports.Count}/{db.destinations.Count}     Miles: {d.miles}</b>");
-            foreach (var c in db.destinations)
+            sb.AppendLine($"<b>Passports: {db.CountOwned(d)}/{db.ActiveDestinations.Count}     Miles: {d.miles}</b>");
+            foreach (var c in db.ActiveDestinations)
                 if (c != null) sb.Append(d.Owns(c.id) ? $"<color=#1F7A78><b>[{c.displayName}]</b></color> " : $"<color=#6B7787>{c.displayName}</color> ");
             statsText.text = sb.ToString();
             controlsText.text = InputPrompts.Format(ControlsTemplate);

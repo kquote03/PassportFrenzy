@@ -6,6 +6,8 @@ namespace PassportFrenzy
     /// <summary>
     /// The game loop:
     /// Home -> Departing -> [Booking -> Residency? -> Shop] -> Chase -> Flying -> CountryRun -> ToAirport -> [Booking ...]
+    /// Departing is the Play intro (run in from the left, camera follows, phone comes up; GameTuning.playIntro) or,
+    /// with the intro off, the run to the home airport door.
     /// Missing the flight (flight timer hits 0) -> Missed -> Home. Owning every destination passport -> Won.
     /// The bracketed airport part is one coroutine (<see cref="AirportSequence"/>). The phone is used while running:
     /// booking happens in the lobby, then the terminal chase starts and the residency form + shop overlay it.
@@ -45,7 +47,15 @@ namespace PassportFrenzy
             R.player.ResetTo(playerStart);
             R.player.SetRunning(false);
             R.player.ClearRunBuffs();
+            R.Cam.Release();
             R.Cam.SnapToTarget();
+            if (T.playIntro)
+            {
+                // Hold the usual menu shot and park the player just past its left edge: Play makes them run in.
+                R.Cam.Hold();
+                float x = Mathf.Max(R.Cam.CenterX - R.Cam.HalfWidth - T.introOffscreenMargin, R.spawner.StartX + 1f);
+                R.player.ResetTo(new Vector2(x, playerStart.y));
+            }
             R.Cam.SetBackground(home.skyColor);
             R.input.SetMenuMode(true);
             R.audioManager.PlayMusic(home);
@@ -54,18 +64,45 @@ namespace PassportFrenzy
             R.ui.mainMenu.Show();
         }
 
-        /// <summary>Main menu Play button: run through the home airport door.</summary>
+        /// <summary>Main menu Play button: the run-in intro (or, with it off, run through the home airport door).</summary>
         public void StartRun()
         {
             if (State != GameState.Home) return;
             R.ui.mainMenu.Hide();
             Run = new RunState(R.countries.home);
             R.input.SetMenuMode(false);
-            R.spawner.TrimAhead(18f);
+            // Trim from the usual standing spot: during the intro the player is still off-screen left.
+            R.spawner.TrimAhead(18f + Mathf.Max(0f, playerStart.x - R.player.transform.position.x));
             R.spawner.SetMode(SpawnMode.AirportSafe);
             R.spawner.EnqueueOnce(R.countries.homeDoorChunk);
             R.player.SetRunning(true);
             SetState(GameState.Departing);
+            if (T.playIntro) _sequence = StartCoroutine(IntroSequence());
+        }
+
+        /// <summary>
+        /// Play intro: the camera holds still while the player runs in from the left to the centre of the screen, then
+        /// it starts following, then the phone comes up (booking). Input is locked until the phone opens.
+        /// Turn off with GameTuning.playIntro (then the phone opens at the home door, as before).
+        /// </summary>
+        IEnumerator IntroSequence()
+        {
+            R.input.SetMenuMode(true);
+            R.player.SetAutoMove(1f);
+            float center = R.Cam.CenterX;
+            float safety = 6f; // never hang here if the player gets stuck
+            while (R.player.transform.position.x < center && safety > 0f)
+            {
+                safety -= Time.deltaTime;
+                yield return null;
+            }
+
+            R.Cam.Release();
+            yield return new WaitForSeconds(T.introFollowSeconds);
+
+            R.player.SetAutoMove(0f);
+            R.input.SetMenuMode(false);
+            _sequence = StartCoroutine(AirportSequence()); // the phone comes up; the home door is just scenery now
         }
 
         // ------------------------------------------------------------------ Per-frame timers
@@ -102,7 +139,7 @@ namespace PassportFrenzy
         {
             switch (id)
             {
-                case FlowTriggerId.HomeDoor when State == GameState.Departing:
+                case FlowTriggerId.HomeDoor when State == GameState.Departing && !T.playIntro: // the intro opens the phone itself
                 case FlowTriggerId.AirportEntrance when State is GameState.CountryRun or GameState.ToAirport:
                     _sequence = StartCoroutine(AirportSequence());
                     break;
@@ -153,7 +190,7 @@ namespace PassportFrenzy
 
             // 1. Booking in the lobby (menu hell: pick within the window or get a random one)
             SetState(GameState.Booking);
-            var options = BookingRules.PickOptions(R.countries.destinations, SaveSystem.Data.passports,
+            var options = BookingRules.PickOptions(R.countries.ActiveDestinations, SaveSystem.Data.passports,
                 here.isHome ? null : here, T.bookingChoices, _rng);
             if (options.Count == 0) { Win(); yield break; }
 
@@ -167,11 +204,11 @@ namespace PassportFrenzy
             bool owned = SaveSystem.Data.Owns(here.id);
             bool eligible = !here.isHome && !owned && Run.IsResidencyEligible(here, T.SecondsPerYear);
             StartFlightTimer(eligible);
+            StartCoroutine(FinalCallAnnouncement(Run, Run.Destination));
 
             // 2. The terminal chase starts now; residency and shop pop up on the phone while you run it.
             int tier = Run.Destination.difficultyTier;
             R.spawner.BeginChase(here, tier, T.TerminalLength(tier));
-            GameEvents.RaiseToast($"Run to the gate! Flight to {Run.Destination.displayName}");
 
             // 3. Residency application (foreign airports only, once per visit)
             if (!here.isHome && !owned)
@@ -186,7 +223,7 @@ namespace PassportFrenzy
                     if (success)
                     {
                         SaveSystem.GrantPassport(here.id);
-                        GameEvents.RaiseToast($"{here.displayName} residency granted! ({SaveSystem.Data.passports.Count}/{R.countries.destinations.Count})");
+                        GameEvents.RaiseToast($"{here.displayName} residency granted! ({R.countries.CountOwned(SaveSystem.Data)}/{R.countries.ActiveDestinations.Count})");
                         if (OwnsAllPassports()) { Win(); yield break; }
                     }
                 }
@@ -205,6 +242,19 @@ namespace PassportFrenzy
             // 5. Phone away: just the run to the gate
             SetState(GameState.Chase);
             _sequence = null;
+        }
+
+        /// <summary>Airport chime, then a "final call" banner with the flight timer. Runs beside the airport sequence.</summary>
+        IEnumerator FinalCallAnnouncement(RunState run, CountryDefinition destination)
+        {
+            yield return new WaitForSeconds(0.35f); // let the booking sound finish
+            if (Run != run || !run.FlightTimerActive) yield break;
+            R.audioManager.Play(SoundIds.Announcement);
+            yield return new WaitForSeconds(0.5f);
+            if (Run != run || !run.FlightTimerActive) yield break;
+            GameEvents.RaiseAnnouncement(
+                $"FINAL CALL FOR {destination.displayName.ToUpperInvariant()}!\nTERMINAL CLOSES IN {TimeFormat.Clock(run.FlightSecondsRemaining)}",
+                T.announcementSeconds);
         }
 
         void ClosePhone()
@@ -257,6 +307,7 @@ namespace PassportFrenzy
             R.spawner.BeginCountry(c, c.difficultyTier, length, festivals, R.countries.arrivalChunk, playerStart.x);
             R.player.ResetTo(playerStart);
             R.player.SetRunning(true);
+            R.Cam.Release();
             R.Cam.SnapToTarget();
             R.Cam.SetBackground(c.skyColor);
             R.audioManager.PlayMusic(c);
@@ -294,7 +345,7 @@ namespace PassportFrenzy
 
         public bool OwnsAllPassports()
         {
-            foreach (var c in R.countries.destinations)
+            foreach (var c in R.countries.ActiveDestinations)
                 if (c != null && !SaveSystem.Data.Owns(c.id)) return false;
             return true;
         }
@@ -317,6 +368,7 @@ namespace PassportFrenzy
         {
             if (_sequence != null) StopCoroutine(_sequence);
             _sequence = null;
+            R.player.SetAutoMove(0f); // an interrupted intro must not keep running the player
         }
 
         // ------------------------------------------------------------------ Debug hooks (DebugPanel)
@@ -344,7 +396,7 @@ namespace PassportFrenzy
 
         public void DebugWin()
         {
-            foreach (var c in R.countries.destinations) if (c != null) SaveSystem.GrantPassport(c.id);
+            foreach (var c in R.countries.ActiveDestinations) if (c != null) SaveSystem.GrantPassport(c.id);
             Win();
         }
     }

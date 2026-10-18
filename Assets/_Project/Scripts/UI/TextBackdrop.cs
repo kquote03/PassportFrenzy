@@ -19,6 +19,13 @@ namespace PassportFrenzy
         RectTransform _rect;
         string _last;
 
+        /// <summary>The label this shape hugs (set it after cloning a label + backdrop pair).</summary>
+        public TMP_Text Target
+        {
+            get => text;
+            set { text = value; _last = null; }
+        }
+
         void Awake()
         {
             _image = GetComponent<Image>();

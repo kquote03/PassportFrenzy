@@ -24,7 +24,7 @@ namespace PassportFrenzy
             var d = SaveSystem.Data;
             int total = Mathf.RoundToInt(d.secondsPlayed);
             statsText.text =
-                $"Passports: {d.passports.Count}/{GameRoot.I.countries.destinations.Count}\n" +
+                $"Passports: {GameRoot.I.countries.CountOwned(d)}/{GameRoot.I.countries.ActiveDestinations.Count}\n" +
                 $"Miles: {d.miles}\n" +
                 $"Countries visited: {d.countriesVisited}\n" +
                 $"Photos taken: {d.photosTaken}\n" +

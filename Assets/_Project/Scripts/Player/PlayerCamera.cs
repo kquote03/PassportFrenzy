@@ -14,8 +14,16 @@ namespace PassportFrenzy
 
         Transform _target;
         float _shakeTimer, _shakeStrength;
+        bool _holding;
+        float _holdX;
 
         public Camera Camera { get; private set; }
+
+        /// <summary>Centre of the view in world X (the held position while holding, so shake doesn't move it).</summary>
+        public float CenterX => _holding ? _holdX : transform.position.x;
+
+        /// <summary>Half the visible width in world units.</summary>
+        public float HalfWidth => Camera.orthographicSize * Camera.aspect;
 
         void Awake() => Camera = GetComponent<Camera>();
 
@@ -26,7 +34,8 @@ namespace PassportFrenzy
 
             Vector3 goal = new Vector3(_target.position.x + Lead, fixedY, transform.position.z);
             Vector3 p = transform.position;
-            p.x = Mathf.Lerp(p.x, goal.x, 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
+            if (_holding) p.x = _holdX;
+            else p.x = Mathf.Lerp(p.x, goal.x, 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
             p.y = fixedY;
 
             if (_shakeTimer > 0f)
@@ -42,6 +51,16 @@ namespace PassportFrenzy
             if (_target == null && GameRoot.I != null) _target = GameRoot.I.player.transform;
             if (_target != null) transform.position = new Vector3(_target.position.x + Lead, fixedY, transform.position.z);
         }
+
+        /// <summary>Stop following and stay where the camera is now (the intro's still shot).</summary>
+        public void Hold()
+        {
+            _holding = true;
+            _holdX = transform.position.x;
+        }
+
+        /// <summary>Follow the player again, easing into the usual lead.</summary>
+        public void Release() => _holding = false;
 
         float Lead => GameRoot.I != null && !GameRoot.I.tuning.autoRun ? freeMoveLeadX : leadX;
 

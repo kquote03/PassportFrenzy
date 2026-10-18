@@ -1,12 +1,14 @@
 """Procedural placeholder SFX for Passport Frenzy (stdlib only, deterministic).
 
 Writes 16-bit mono 44.1 kHz WAVs, one per SoundIds hook, to Assets/_Project/Placeholder/Audio/SFX/<id>.wav.
-Run from the repo root:  python Tools/sfx/generate_sfx.py
+Run from the repo root:  python Tools/sfx/generate_sfx.py            (all sounds)
+                         python Tools/sfx/generate_sfx.py announcement   (only the named ones)
 """
 import math
 import os
 import random
 import struct
+import sys
 import wave
 
 SR = 44100
@@ -319,6 +321,15 @@ def win(rng):
     return out
 
 
+def announcement(rng):
+    # Airport PA "ding-dong": two soft bell tones, high then low, ringing out.
+    soft = ((1, 1.0), (2.0, 0.22), (3.0, 0.06))
+    out = silence(1.5)
+    out = mix(out, apply(bell(midi(76), 1.0, 0.45, soft), [0.8] * int(1.0 * SR)))
+    out = mix(out, offset(bell(midi(72), 1.1, 0.55, soft), 0.42))
+    return lowpass(out, 5000)
+
+
 SOUNDS = {
     "jump": jump,
     "hit": hit,
@@ -337,16 +348,23 @@ SOUNDS = {
     "flight_missed": flight_missed,
     "visa_overstay": visa_overstay,
     "win": win,
+    "announcement": announcement,
 }
 
 # Per-sound loudness (dBFS peak) so short UI ticks don't out-shout big moments.
-PEAKS = {"mash": -9.0, "phone_open": -8.0, "takeoff": -4.0, "jump": -9.0, "rejected": -7.0, "visa_overstay": -8.0,
+PEAKS = {"announcement": -4.0, "mash": -9.0, "phone_open": -8.0, "takeoff": -4.0, "jump": -9.0, "rejected": -7.0, "visa_overstay": -8.0,
          "flight_missed": -5.0}
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
+    only = set(sys.argv[1:])
+    unknown = only - SOUNDS.keys()
+    if unknown:
+        sys.exit("Unknown sound(s): " + ", ".join(sorted(unknown)))
     for name, fn in SOUNDS.items():
+        if only and name not in only:
+            continue
         rng = random.Random(sum(map(ord, name)))  # deterministic per sound
         write(name, fn(rng), PEAKS.get(name, -3.0))
 

@@ -57,8 +57,18 @@ namespace PassportFrenzy
         [Header("Buffs")]
         public float speedBoostMultiplier = 1.6f;
 
+        [Header("Intro (Play: run in from the left, camera follows, phone comes up)")]
+        [Tooltip("Off = the old start: the player waits in the lobby and the phone opens at the home door.")]
+        public bool playIntro = true;
+        [Tooltip("How far past the left screen edge the player starts.")]
+        public float introOffscreenMargin = 1.5f;
+        [Tooltip("Seconds between the camera starting to follow and the phone coming up.")]
+        public float introFollowSeconds = 0.6f;
+
         [Header("Booking app")]
         [Range(1, 3)] public int bookingChoices = 3;
+        [Tooltip("How long the 'Final call' banner stays up after booking.")]
+        public float announcementSeconds = 3.5f;
         public Vector2 bookingWindowSeconds = new Vector2(4f, 6f);
 
         [Header("Residency application")]

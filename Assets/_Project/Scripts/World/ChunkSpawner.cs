@@ -36,6 +36,8 @@ namespace PassportFrenzy
 
         public SpawnMode Mode => _mode;
         /// <summary>World X of the gate trigger once the gate chunk is spawned, else NaN.</summary>
+        /// <summary>World X where a reset world's first chunk starts (nothing exists to the left of it).</summary>
+        public float StartX => startX;
         public float GateX { get; private set; } = float.NaN;
         public float ChaseStartX { get; private set; } = float.NaN;
         public float PlannedGateX => float.IsNaN(GateX) ? ChaseStartX + _plannedChaseLength : GateX;

@@ -21,14 +21,84 @@ namespace PassportFrenzy
         [SerializeField] TMP_Text toastText;
         [SerializeField] Image photoFlash;
         [SerializeField] float toastSeconds = 2.2f;
+        [Header("Announcement banner (built from the toast at runtime)")]
+        [SerializeField] float announcementFontScale = 1.6f;
+        [Tooltip("Banner position below the top of the screen (the toast sits at about -206).")]
+        [SerializeField] float announcementY = -290f;
 
         readonly Queue<string> _toasts = new Queue<string>();
         float _toastTimer;
         FestivalZone _zone;
+        RectTransform _announce;
+        CanvasGroup _announceGroup;
+        TMP_Text _announceText;
+        float _announceTimer, _announceSeconds;
+
+        void Awake() => BuildAnnouncement();
+
+        /// <summary>
+        /// Clones the toast label and its pill into a bigger banner, so it matches the HUD style without a prefab change.
+        /// </summary>
+        void BuildAnnouncement()
+        {
+            var parent = toastText.transform.parent;
+            var go = new GameObject("Announcement", typeof(RectTransform), typeof(CanvasGroup));
+            _announce = (RectTransform)go.transform;
+            _announce.SetParent(parent, false);
+            _announce.SetSiblingIndex(toastText.transform.GetSiblingIndex() + 1);
+            _announce.anchorMin = _announce.anchorMax = _announce.pivot = new Vector2(0.5f, 1f);
+            _announce.anchoredPosition = new Vector2(0f, announcementY);
+            _announce.sizeDelta = new Vector2(toastText.rectTransform.sizeDelta.x, 220f);
+            _announceGroup = go.GetComponent<CanvasGroup>();
+            _announceGroup.blocksRaycasts = false;
+            _announceGroup.interactable = false;
+
+            TextBackdrop pill = null;
+            foreach (Transform sibling in parent)
+            {
+                var b = sibling.GetComponent<TextBackdrop>();
+                if (b != null && b.Target == toastText) { pill = b; break; }
+            }
+            if (pill != null) Instantiate(pill.gameObject, _announce, false).name = "AnnouncementBackdrop";
+
+            _announceText = Instantiate(toastText.gameObject, _announce, false).GetComponent<TMP_Text>();
+            _announceText.name = "AnnouncementText";
+            var rt = _announceText.rectTransform;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = _announce.sizeDelta;
+            _announceText.fontSize = toastText.fontSize * announcementFontScale;
+            _announceText.lineSpacing = -10f;
+            _announceText.gameObject.SetActive(true);
+            if (pill != null) _announce.GetComponentInChildren<TextBackdrop>().Target = _announceText;
+            go.SetActive(false);
+        }
+
+        void OnAnnouncement(string msg, float seconds)
+        {
+            if (string.IsNullOrEmpty(msg)) return;
+            _announceText.text = msg;
+            _announceSeconds = _announceTimer = Mathf.Max(0.5f, seconds);
+            _announce.gameObject.SetActive(true);
+            UpdateAnnouncement();
+        }
+
+        /// <summary>Pops in (scale 1.25 -> 1), holds, fades out over the last 0.4 s.</summary>
+        void UpdateAnnouncement()
+        {
+            if (_announce == null || !_announce.gameObject.activeSelf) return;
+            _announceTimer -= Time.deltaTime;
+            if (_announceTimer <= 0f) { _announce.gameObject.SetActive(false); return; }
+            float shown = _announceSeconds - _announceTimer;
+            float pop = Mathf.Clamp01(shown / 0.25f);
+            _announce.localScale = Vector3.one * Mathf.Lerp(1.25f, 1f, 1f - (1f - pop) * (1f - pop));
+            _announceGroup.alpha = Mathf.Min(Mathf.Clamp01(shown / 0.12f), Mathf.Clamp01(_announceTimer / 0.4f));
+        }
 
         void OnEnable()
         {
             GameEvents.Toast += OnToast;
+            GameEvents.Announcement += OnAnnouncement;
             GameEvents.FestivalInRange += OnFestival;
             GameEvents.PhotoTaken += OnPhoto;
             toastText.gameObject.SetActive(false);
@@ -39,6 +109,7 @@ namespace PassportFrenzy
         void OnDisable()
         {
             GameEvents.Toast -= OnToast;
+            GameEvents.Announcement -= OnAnnouncement;
             GameEvents.FestivalInRange -= OnFestival;
             GameEvents.PhotoTaken -= OnPhoto;
         }
@@ -63,6 +134,7 @@ namespace PassportFrenzy
         void Update()
         {
             UpdateToast();
+            UpdateAnnouncement();
             if (photoFlash.color.a > 0f) SetFlash(Mathf.MoveTowards(photoFlash.color.a, 0f, Time.deltaTime * 3f));
 
             var root = GameRoot.I;
@@ -115,7 +187,7 @@ namespace PassportFrenzy
             }
 
             photosText.text = c.isHome ? "" : $"Photos here: {run.PhotoCount(c.id)}/{T.photosRequired}";
-            milesText.text = $"Miles: {SaveSystem.Data.miles}   Passports: {SaveSystem.Data.passports.Count}/{root.countries.destinations.Count}";
+            milesText.text = $"Miles: {SaveSystem.Data.miles}   Passports: {root.countries.CountOwned(SaveSystem.Data)}/{root.countries.ActiveDestinations.Count}";
 
             var held = root.buffs.Held;
             itemText.text = held != null ? InputPrompts.Format($"Item: {held.displayName}  {{Use}}") : "Item: (empty)";

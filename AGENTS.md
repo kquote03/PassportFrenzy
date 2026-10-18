@@ -13,10 +13,13 @@ Jam Demo Mode: 1 year = 6 s). An application also needs **3 photos of festivals*
 The pursuer is the **departing flight**: miss it and the run ends.
 
 ### Game loop
-1. **Home airport (UAE) = main menu.** Play → the character runs through the airport door.
+1. **Home airport (UAE) = main menu.** Play → **intro**: the camera holds still while the character runs in from the left edge
+   to the centre, then the camera starts following and the phone comes up (`GameTuning.playIntro`; off = the old start where
+   the phone opens at the home airport door).
    **The phone is used while running** (you keep moving and jumping). Booking happens in the obstacle-free lobby; right after
    booking the **terminal chase starts** and steps 3–4 pop up on the phone while you dodge crowds and obstacles.
 2. **Booking app** (phone): 3 random unowned destinations, each with a random visa (`5 years (5 min)`). Pick within about 5 s or a random one is booked for you. The **flight timer** starts and the terminal begins.
+   At every booking an airport chime (`announcement`) plays and a banner reads "FINAL CALL FOR JAPAN! TERMINAL CLOSES IN 0:45".
 3. **Residency application** (foreign airports only, about 2 s after booking, only if years in this country ≥ required): mash to fill the form (spam left click / RT), then attach 3 photos (mouse: drag; controller: flick the right stick right). Timeout or too few photos = fail, so try again on a later visit. Success = passport (saved forever).
 4. **Freezone shop** (phone, every airport): spend miles on one buff. You hold at most one item.
 5. **Airport chase** through crowds to the gate (already running since booking). Terminal length and crowd density scale with the destination's tier.
@@ -27,7 +30,9 @@ The pursuer is the **departing flight**: miss it and the run ends.
    airport, you've **overstayed: all miles are confiscated** (the run continues). Residency time only accrues while in the
    country on a valid visa, and pauses at airports. → step 2.
 - **Lose:** the flight timer hits 0 → back to the menu. Miles and passports are kept (JSON save).
-- **Win:** own all 10 destination passports (lifetime collection across runs) → win screen with stats.
+- **Win:** own every destination passport in the rotation (lifetime collection across runs) → win screen with stats.
+  **Demo rotation:** only **USA, Japan and India** can be booked for now (`CountryDatabase.demoRotationOnly` +
+  `demoDestinations`), so the win is 3 passports. Untick `demoRotationOnly` to bring back all 10.
 
 ### Controls (auto-detected from the last device used)
 | Action | Keyboard / mouse | Gamepad |
@@ -173,6 +178,8 @@ Assets/_Project/
    generic pool, and `airportChunkPool` empty to use the default airport.
 3. Optional: give it its own `festivalZonePrefab` and `music`.
 4. Add the asset to `Data/CountryDatabase.asset → destinations`. Done (the win condition = owning all destinations).
+   While `demoRotationOnly` is on, also add it to `demoDestinations` (only that list is bookable). Code reads
+   `CountryDatabase.ActiveDestinations` / `CountOwned`, never `destinations` directly.
 
 ## 9. How to tune
 - `Data/GameTuning.asset` holds every number: run speed, jump, stumble/crowd multipliers, booking/mash/photo/shop windows, flight timer
@@ -184,6 +191,8 @@ Assets/_Project/
 - Visa deadline: `visaDistanceSlack` (lower = more spare time). `CountryDatabase.fillerChunk` (6 m) lands the airport
   entrance exactly at the end.
 - **Jam Demo Mode** (`jamDemoMode`, also toggled in the debug panel at runtime): 1 year = 6 s, country run ≤ 30 s, chase ≈ 30 s.
+- **Intro** (`playIntro`, `introOffscreenMargin`, `introFollowSeconds`) and the final-call banner (`announcementSeconds`;
+  position and size on `HudView`: `announcementY`, `announcementFontScale`).
 - Per-obstacle overrides are on the prefab (`SlowObstacle.stumbleMultiplier`, `CrowdZone.speedMultiplier`, `DensityGated.baseChance`).
 - Per-country values are in its `Country_*` asset.
 

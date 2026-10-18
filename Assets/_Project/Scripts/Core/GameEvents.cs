@@ -5,7 +5,7 @@ namespace PassportFrenzy
     public enum GameState
     {
         Home,          // main menu at the home airport, player idle
-        Departing,     // pressed Play, running to the home airport door
+        Departing,     // pressed Play: the run-in intro, or running to the home airport door
         Booking,       // phone: booking app
         Residency,     // phone: residency application
         Shop,          // phone: freezone shop
@@ -22,6 +22,7 @@ namespace PassportFrenzy
     {
         public static event Action<GameState> StateChanged;
         public static event Action<string> Toast;
+        public static event Action<string, float> Announcement; // big banner text, seconds on screen
         public static event Action<PhotoRecord> PhotoTaken;
         public static event Action<HitKind, bool> PlayerHit; // kind, absorbedByShield
         public static event Action ItemChanged;
@@ -33,12 +34,13 @@ namespace PassportFrenzy
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics()
         {
-            StateChanged = null; Toast = null; PhotoTaken = null; PlayerHit = null;
+            StateChanged = null; Toast = null; Announcement = null; PhotoTaken = null; PlayerHit = null;
             ItemChanged = null; PassportGranted = null; MilesChanged = null; FestivalInRange = null;
         }
 
         public static void RaiseStateChanged(GameState s) => StateChanged?.Invoke(s);
         public static void RaiseToast(string msg) => Toast?.Invoke(msg);
+        public static void RaiseAnnouncement(string msg, float seconds) => Announcement?.Invoke(msg, seconds);
         public static void RaisePhotoTaken(PhotoRecord p) => PhotoTaken?.Invoke(p);
         public static void RaisePlayerHit(HitKind k, bool absorbed) => PlayerHit?.Invoke(k, absorbed);
         public static void RaiseItemChanged() => ItemChanged?.Invoke();

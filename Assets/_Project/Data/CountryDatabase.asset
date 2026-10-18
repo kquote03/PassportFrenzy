@@ -24,6 +24,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 61f85371a667617458440fb67358871a, type: 2}
   - {fileID: 11400000, guid: 3dc0d004741e7cf4caa548291cb884a4, type: 2}
   - {fileID: 11400000, guid: 7f9a350d671543642abd65ba0321830b, type: 2}
+  demoRotationOnly: 1
+  demoDestinations:
+  - {fileID: 11400000, guid: bc0e4a3b64bf09649ab0ac04123f40b0, type: 2}
+  - {fileID: 11400000, guid: 863ebbd73a8615f4196ca6738d915c0b, type: 2}
+  - {fileID: 11400000, guid: 0dee3cfe2be3a1b4c82336ecd33df8f3, type: 2}
   genericChunkPool:
   - prefab: {fileID: 9166658697830138477, guid: e0e5ce547d0dce44f9e96a80ea95d910, type: 3}
     weight: 0.6

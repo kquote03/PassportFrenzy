@@ -64,6 +64,9 @@ MonoBehaviour:
   - id: win
     clip: {fileID: 8300000, guid: bd3d4e5d0a0462d49b4bb943a848e85a, type: 3}
     volume: 1
+  - id: announcement
+    clip: {fileID: 8300000, guid: 927950ded99846c088bfae72bab16b45, type: 3}
+    volume: 1
   - id: music_ae
     clip: {fileID: 0}
     volume: 1
