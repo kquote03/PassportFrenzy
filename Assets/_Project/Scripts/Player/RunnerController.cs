@@ -4,8 +4,8 @@ using UnityEngine;
 namespace PassportFrenzy
 {
     /// <summary>
-    /// Auto-runner. Moves right at a speed built from multipliers (stumble, crowd, boost, block).
-    /// Jump is the only movement input. Values come from GameTuning.
+    /// Side-scrolling runner. Move input (A/D, arrows, stick, D-pad) drives a speed built from multipliers
+    /// (stumble, crowd, boost, block), plus jump. GameTuning.autoRun = legacy auto-runner. Values come from GameTuning.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class RunnerController : MonoBehaviour

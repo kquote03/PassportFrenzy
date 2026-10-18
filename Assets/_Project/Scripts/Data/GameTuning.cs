@@ -33,9 +33,9 @@ namespace PassportFrenzy
         [Tooltip("Real seconds per in-game year (normal mode). Brief: 1 year = 1 minute.")]
         public float secondsPerYear = 60f;
 
-        [Header("Movement mode (experiment)")]
-        [Tooltip("True = classic auto-runner. False = free movement with Move (A/D, arrows, stick, D-pad).")]
-        public bool autoRun = true;
+        [Header("Movement")]
+        [Tooltip("False = free movement with Move (A/D, arrows, stick, D-pad). True = legacy auto-runner fallback.")]
+        public bool autoRun = false;
         [Tooltip("Free movement: how fast horizontal speed reaches its target (units/s^2).")]
         public float moveAcceleration = 60f;
         [Tooltip("Free movement: how far you can walk back from the furthest point reached.")]

@@ -14,14 +14,13 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M9 Debug panel + Jam Demo Mode
 - [x] M10 Polish pass (procedural run bob/lean, boost tint, crowd status, menu focus, scale fix). More polish welcome; see Next tasks
 
-## Branch `experiment/free-movement` (this branch)
-- [x] Free movement (no auto-scroll) behind `GameTuning.autoRun` (off on this branch): A/D, ←/→, left stick, D-pad.
+## Free movement (adopted on main)
+- [x] Free movement (no auto-scroll); `GameTuning.autoRun` is off and kept only as a legacy fallback: A/D, ←/→, left stick, D-pad.
   Blocks re-arm when you back off; 18 m backtrack limit; facing flip; smaller camera lead; `{Move}` prompt on the menu.
 - Verified via MCP: idle = no movement; D → right (to 44.6), A → back to the 18 m limit (26.4) with the sprite flipped; device prompt
   switches to [L-Stick]. Autopilot loops from the home menu on keyboard and gamepad: door → booking → shop → chase → land →
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
-- Open questions for playtest: should free mode get a bigger visa slack (lower `visaDistanceSlack`)? Should walls be physical?
-  Should the player keep moving in menus?
+- Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
 ## Post-prototype fixes (after M10)
 - [x] Residency time pauses at airports (and after a visa overstay). The HUD shows "(paused at airport)".
@@ -86,6 +85,7 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Airport at a fixed distance (user decision): visa = deadline. Overstay = lose all lifetime miles; the run continues (user decision).
 - The airport entrance trigger lands exactly at the planned length: whole chunks only while they fit, plus 6 m filler chunks.
   If a planned festival would no longer fit, it's placed early.
+- **Free movement is the movement method** (user decision after playtesting the experiment branch).
 - Block obstacles are trigger logic (speed 0 until jump), not physical walls.
 - Run In Background enabled. Input settings asset: background behavior Ignore Focus (needed for MCP-driven tests).
 - Auto Refresh disabled in the editor at the user's request (agents refresh manually).

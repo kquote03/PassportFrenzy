@@ -5,7 +5,7 @@
 
 ## 1. What this is
 A 1-day game jam prototype (UAE jam, theme **"Festival of Passports"**).
-2D endless **auto-runner rogue-lite**, left → right, loosely inspired by *Power Pamplona* (2007). You fly between countries and
+2D side-scrolling **runner rogue-lite** with free movement (you control the pace), left → right, loosely inspired by *Power Pamplona* (2007). You fly between countries and
 collect **residencies (passports)**. Time spent *in* a country (not its airport) counts toward residency (**1 in-game year = 1 real minute**;
 Jam Demo Mode: 1 year = 6 s). An application also needs **3 photos of festivals** in that country (proof of integration).
 **"Menu hell":** timed phone-UI tasks (booking, residency form, duty-free) that you do *while still running*.
@@ -28,7 +28,8 @@ The pursuer is the **departing flight**: miss it and the run ends.
 ### Controls (auto-detected from the last device used)
 | Action | Keyboard / mouse | Gamepad |
 |---|---|---|
-| Jump (only movement) | Space / W / ↑ | A (South) |
+| Move | A/D or ←/→ | Left stick / D-pad |
+| Jump | Space / W / ↑ | A (South) |
 | Photo | F / right mouse | X (West) |
 | Use item | E / Q | Y (North) |
 | Menu navigate / confirm | Arrows/WASD, Space/Enter, mouse | Stick/D-pad, A |
@@ -38,17 +39,16 @@ The pursuer is the **departing flight**: miss it and the run ends.
 
 While any phone menu is open the **Gameplay** action map is disabled (no jump), and the world spawns only obstacle-free chunks.
 
-### Experiment branch: `experiment/free-movement`
-No auto-scroll: **move with A/D or ←/→, the left stick, or the D-pad** (W/↑/Space/A still jump). Toggle with
-`GameTuning.autoRun` (this branch's asset has it **off**; set it on to get the classic runner back).
+### Movement
+No auto-scroll: **move with A/D or ←/→, the left stick, or the D-pad** (W/↑/Space/A jump). Adopted on `main` after the
+`experiment/free-movement` playtest. `GameTuning.autoRun` (off) is kept only as a legacy fallback to the old auto-runner.
 - `Gameplay/Move` action (Vector2, only x used). `RunnerController` accelerates toward `Move.x × speed`
   (`moveAcceleration`); stumble, crowd and boost multipliers still apply. The sprite faces the direction of travel.
 - Blocks stop only forward motion. Back out of a wall and it re-arms (you still have to jump it).
 - You can walk back up to `maxBacktrackDistance` (18 m) from your furthest point; chunks behind that are despawned.
 - The camera lead is smaller (`PlayerCamera.freeMoveLeadX` = 3).
-- Phone menus still disable gameplay input, so you stand still while booking or shopping.
-- Timers (visa deadline, flight) are unchanged. Distance now depends on holding right.
-- `PlaytestAutopilot` holds right (D / stick) during running states when `autoRun` is off.
+- Timers (visa deadline, flight) assume `baseRunSpeed`, so holding right is how you make them.
+- `PlaytestAutopilot` holds right (D / stick) during running states.
 
 ## 2. Jam judging rubric (optimize for this)
 | Category | Points | Breakdown |
