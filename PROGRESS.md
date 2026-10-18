@@ -22,7 +22,19 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   country run → airport → residency. One China visit overstayed (obstacles in a tight window); Germany/UK were made on time.
 - Merged into `main` after the user's playtest (the branch stays on the remote for reference).
 
-## Phone while running (awaiting user playtest)
+## Airport backdrop (placeholder art, awaiting user playtest)
+- [x] The user's generated, horizontally tileable `Placeholder/airport-main-section-scrollable.png` (1536×1024, imported at
+  64 PPU = 24 × 16 units, one copy per 24-unit chunk) is the `Backdrop/Wall` sprite of the indoor airport chunks:
+  Airport Arrival/Lobby/Freezone/Gate, the 4 Chase chunks, and Home Door/Lobby. Its painted floor line sits on the ground (y = 0).
+- In those chunks:
+  - Wall PaletteTint removed (full-colour art).
+  - Placeholder Window/Mullion/Stripe, Bench/Palm props and the flat ground strip disabled (not deleted; the ground collider is
+    unchanged).
+  - Signs, door frames, gate window/plane and duty-free shelves kept.
+  - The street-side `Airport_Entrance` chunk is unchanged.
+- Note: `Rebuild ALL` would regenerate these prefabs and drop the backdrop (art-swap contract §7).
+
+## Phone while running (done, playtested OK)
 - [x] Gameplay stays live while the phone is open (`InputRouter.SetPhoneMode`). New **Phone** action map: right stick navigate,
   RT select/mash; keyboard players use the mouse only (click, drag, spam left click to mash). Space/Enter/A never touch the phone.
 - [x] Menus overlay the chase: booking in the lobby, then the terminal starts immediately; residency + shop pop up during it.

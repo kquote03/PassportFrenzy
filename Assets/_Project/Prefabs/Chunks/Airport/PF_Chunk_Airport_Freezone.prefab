@@ -41,7 +41,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 183649825409217430}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -570,7 +570,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4482413338592572030
 Transform:
   m_ObjectHideFlags: 0
@@ -670,7 +670,6 @@ GameObject:
   m_Component:
   - component: {fileID: 172631698875621147}
   - component: {fileID: 2889663214071961710}
-  - component: {fileID: 4320188153752729758}
   m_Layer: 0
   m_Name: Wall
   m_TagString: Untagged
@@ -687,8 +686,8 @@ Transform:
   m_GameObject: {fileID: 3270376979945227411}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12, y: 5, z: 0}
-  m_LocalScale: {x: 24, y: 10, z: 1}
+  m_LocalPosition: {x: 12, y: 3.875, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8257737730492926857}
@@ -742,7 +741,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 6bc094edbb575f24b98b7f61031887b3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5fdb2777c5dba2043aeac046a96eaa40, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -753,20 +752,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!114 &4320188153752729758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3270376979945227411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: acb9ba813859f0842ad4a29a5d04019a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.PaletteTint
-  role: 3
-  multiply: {r: 0.92, g: 0.92, b: 0.92, a: 1}
 --- !u!1 &3362301547621719770
 GameObject:
   m_ObjectHideFlags: 0
@@ -1136,7 +1121,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6140972495119210028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -1296,7 +1281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7008584152153310230
 Transform:
   m_ObjectHideFlags: 0
@@ -1664,7 +1649,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5400638248700485540
 Transform:
   m_ObjectHideFlags: 0
@@ -1756,7 +1741,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &383662345933769780
 Transform:
   m_ObjectHideFlags: 0
@@ -1941,7 +1926,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2519920910688958398
 Transform:
   m_ObjectHideFlags: 0
@@ -2140,7 +2125,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6338347437676043201
 Transform:
   m_ObjectHideFlags: 0
@@ -2247,7 +2232,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &854684113351101649
 Transform:
   m_ObjectHideFlags: 0
