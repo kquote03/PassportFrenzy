@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8410397594476412999}
   - component: {fileID: 5401230518149661643}
   - component: {fileID: 6436138766376919630}
+  - component: {fileID: 1348672234325863104}
   m_Layer: 0
   m_Name: PF_GameRoot
   m_TagString: Untagged
@@ -40,6 +41,7 @@ Transform:
   - {fileID: 4282224746482652008}
   - {fileID: 2495807040953757331}
   - {fileID: 4900695381510550298}
+  - {fileID: 2793572735689430888}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3442550955239966230
@@ -71,6 +73,7 @@ MonoBehaviour:
   audioManager: {fileID: 6436138766376919630}
   buffs: {fileID: 5401230518149661643}
   ui: {fileID: 8310010061297576392}
+  background: {fileID: 1348672234325863104}
   player: {fileID: 2532387025959567637}
 --- !u!114 &7496799126171627234
 MonoBehaviour:
@@ -138,6 +141,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.AudioManager
   sfxSource: {fileID: 3352329436255362293}
   musicSource: {fileID: 7601255518320305190}
+--- !u!114 &1348672234325863104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524655453124816209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8541003a87dbe4da2cc72b575f2df2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.ParallaxBackground
+  layerParent: {fileID: 2793572735689430888}
+  layers:
+  - name: Clouds
+    sprite: {fileID: 21300000, guid: 3c8b7263f2321104f863fe8996b855f4, type: 3}
+    motion: 0.05
+    sortingOrder: -38
+    baseY: 0
+    driftSpeed: 0.3
+    alpha: 0.8
+    tint: 0
+  - name: Far
+    sprite: {fileID: 21300000, guid: 93538108655b9ca4c9497703af8d51bb, type: 3}
+    motion: 0.15
+    sortingOrder: -35
+    baseY: 0
+    driftSpeed: 0
+    alpha: 1
+    tint: 1
+  - name: Mid
+    sprite: {fileID: 21300000, guid: 9a980b0adc534a942a1a60abbc0de4a8, type: 3}
+    motion: 0.4
+    sortingOrder: -30
+    baseY: 0
+    driftSpeed: 0
+    alpha: 0.92
+    tint: 2
+  tileWidth: 32
+  tilesPerLayer: 3
+  skyHazeSprite: {fileID: 21300000, guid: 45fea491500eeeb4fa46111c0ab16c13, type: 3}
+  groundHazeSprite: {fileID: 21300000, guid: 6bc094edbb575f24b98b7f61031887b3, type: 3}
+  hazeOrder: -40
+  skyHazeY: {x: -1, y: 9}
+  groundHazeY: {x: -3.5, y: -2}
+--- !u!1 &1133580880590706001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2793572735689430888}
+  m_Layer: 0
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2793572735689430888
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133580880590706001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8184203783000262983}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4536825946627378146
 GameObject:
   m_ObjectHideFlags: 0

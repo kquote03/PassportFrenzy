@@ -31,4 +31,6 @@ MonoBehaviour:
   airportChunkPool: []
   signatureFestivalChunk: {fileID: 0}
   festivalZonePrefab: {fileID: 0}
+  backgroundFar: {fileID: 21300000, guid: b8a4de4c3c8263f4988930c3f473a0f6, type: 3}
+  backgroundMid: {fileID: 21300000, guid: 61a46fcb5776f2947a404038b9f7d7ad, type: 3}
   music: {fileID: 0}

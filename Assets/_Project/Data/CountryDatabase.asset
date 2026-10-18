@@ -60,3 +60,4 @@ MonoBehaviour:
   homeDoorChunk: {fileID: 5863200422409988822, guid: 629879bee03f7b74f9d78f05158b97c8, type: 3}
   pickupPrefab: {fileID: 9016683807241428182, guid: dbaa82bf06bb02e45a407858411bc317, type: 3}
   defaultFestivalZonePrefab: {fileID: 2748942708700959704, guid: 65dda9b8ccea35d4ba260ed8a271c9c4, type: 3}
+  planePrefab: {fileID: 3234883562502673553, guid: f1055fe9e745e414ea76dd96576213ef, type: 3}

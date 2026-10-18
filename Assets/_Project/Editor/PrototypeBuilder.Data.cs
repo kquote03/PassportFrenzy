@@ -169,6 +169,8 @@ namespace PassportFrenzy.EditorTools
                 c.airportChunkPool = System.Array.Empty<WeightedChunk>();
                 c.festivalZonePrefab = FestivalFor(s.id);
                 c.signatureFestivalChunk = home ? null : SignatureFestivalFor(s.id);
+                c.backgroundFar = BgSprite($"bg_{s.id}_far") ?? BgSprite("bg_generic_far");
+                c.backgroundMid = BgSprite($"bg_{s.id}_mid") ?? BgSprite("bg_generic_mid");
             });
         }
 
@@ -193,6 +195,7 @@ namespace PassportFrenzy.EditorTools
                 db.homeDoorChunk = ChHomeDoor;
                 db.pickupPrefab = Load<BuffPickup>("Pickups/PF_Pickup_Buff");
                 db.defaultFestivalZonePrefab = Load<FestivalZone>("Festivals/PF_Festival_Generic");
+                db.planePrefab = Load<PlaneDeparture>("World/PF_Plane");
             });
 
             d.sounds = Asset<SoundLibrary>($"{DataDir}/SoundLibrary.asset", lib =>

@@ -14,6 +14,30 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - [x] M9 Debug panel + Jam Demo Mode
 - [x] M10 Polish pass (procedural run bob/lean, boost tint, crowd status, menu focus, scale fix). More polish welcome; see Next tasks
 
+## Plane departure + parallax backgrounds (branch `feature/plane-departure-parallax`, awaiting user playtest)
+- [x] **Boarding animation:** at the gate the character runs up to the plane parked behind a floor-to-ceiling glass wall
+  (`WindowMask` SpriteMask), vanishes into the jet bridge (`RunnerController.SetVisible`), the plane taxis, pitches up and
+  climbs out of the window (`PlaneDeparture` + pure `PlaneFlightCurve.Takeoff`, `takeoffSeconds` 2.2 = the clip), then the
+  flight card (now 1.5 s). `ChunkSpawner.GateChunk` exposes the nested plane.
+- [x] **Missed flight:** the camera holds and a plane (`CountryDatabase.planePrefab`) flies past right-to-left along the painted
+  window band (`FlyPast`, `flyPastY` 7.4), the sad trombone plays 0.4 s in, then the MISSED card. The stray plane is
+  destroyed on landing/home.
+- [x] **Procedural parallax backgrounds** for all 11 countries (`Editor/PrototypeBuilder.Backgrounds.cs`, menu
+  `Generate Country Backgrounds`): white silhouette PNGs (32 × 10 units, 24 PPU, wrap-around drawing so tiles connect) with
+  per-country landmarks (Eiffel/Arc, Big Ben/Eye/Shard, Fuji/pagoda/torii, Taj Mahal, Burj Khalifa/Burj Al Arab, Great
+  Wall/pagoda, Brandenburg/Fernsehturm, Kremlin/St Basil's, Sagrada/windmill, Wat Arun/stupa, NYC/Liberty/bridge) plus a
+  mid skyline with a roof style per country, shared clouds and a sky-haze gradient. `ParallaxBackground` (on `PF_GameRoot`)
+  tiles them behind the chunks (orders -40..-30) at 0.05/0.15/0.4 of world motion, tinted from the palette with a minimum
+  contrast against the sky (`ParallaxMath.LayerTint`), and adds a ground haze below the road (no more bare sky there).
+  The painted airport wall hides the layers indoors automatically.
+- Idempotent prefab patches (`Patch Gate Plane + Parallax`, also run by `Build`): gate glass + mask + nested `PF_Plane`,
+  `ParallaxBackground` on GameRoot, country background sprites, `planePrefab`. `Rebuild ALL` would drop them (and the wall).
+- New editor helper `EditModeTestRun.Run()` (menu `Run EditMode Tests (async)`): runs the tests through `TestRunnerApi` because
+  MCP `run_tests` hangs this editor (see AGENTS.md §11).
+- Verified so far: 28 EditMode tests pass (10 new: parallax tiling/tint, flight curves); all 11 countries have far/mid sprites;
+  the USA run shows the NYC skyline, clouds and haze behind the chunk buildings, continuous across chunk seams; the player
+  vanished at the gate and the masked gate plane played the takeoff in Flying.
+
 ## Free movement (adopted on main)
 - [x] Free movement (no auto-scroll); `GameTuning.autoRun` is off and kept only as a legacy fallback: A/D, ←/→, left stick, D-pad.
   Blocks re-arm when you back off; 18 m backtrack limit; facing flip; smaller camera lead; `{Move}` prompt on the menu.

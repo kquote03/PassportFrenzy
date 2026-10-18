@@ -41,6 +41,8 @@ namespace PassportFrenzy
         [Header("Shared prefabs")]
         public BuffPickup pickupPrefab;
         public FestivalZone defaultFestivalZonePrefab;
+        [Tooltip("Plane spawned for the fly-past when a flight is missed (the gate chunk nests its own copy).")]
+        public PlaneDeparture planePrefab;
 
         /// <summary>Destinations in play: the demo rotation when it is on (and filled in), otherwise all of them.</summary>
         public IList<CountryDefinition> ActiveDestinations =>

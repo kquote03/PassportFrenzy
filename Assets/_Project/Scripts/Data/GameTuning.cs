@@ -90,8 +90,22 @@ namespace PassportFrenzy
         [Range(0f, 1f)] public float menuOverlapAllowance = 0.4f;
         [Tooltip("Chase time = (terminal / speed) * crowd factor * slack.")]
         public float chaseSlackMultiplier = 1.25f;
-        public float flyingScreenSeconds = 2.5f;
+        public float flyingScreenSeconds = 1.5f;
         public float missedScreenSeconds = 3.5f;
+        [Tooltip("Boarding: the plane taxis and climbs out of the gate window over this long (the takeoff clip is 2.2 s). "
+                 + "Also the length of the fly-past when a flight is missed.")]
+        public float takeoffSeconds = 2.2f;
+        [Tooltip("Boarding: how far before the parked plane the character vanishes into the jet bridge.")]
+        public float boardingOffsetX = 4f;
+        [Tooltip("Boarding: give up running toward the plane after this long (stuck behind something).")]
+        public float boardingRunMaxSeconds = 1.5f;
+        [Tooltip("Missed flight: world Y of the plane that flies past without you (the painted window band).")]
+        public float flyPastY = 7.4f;
+
+        [Header("Parallax backdrop (country runs)")]
+        [Tooltip("How far the far skyline's colour moves from the sky toward the country's primary colour.")]
+        [Range(0f, 1f)] public float parallaxFarBlend = 0.35f;
+        [Range(0f, 1f)] public float parallaxMidBlend = 0.6f;
         public int milesBasePerFlight = 100;
         [Tooltip("Miles per real second spent in the country you are leaving.")]
         public float milesPerSecondStayed = 2f;

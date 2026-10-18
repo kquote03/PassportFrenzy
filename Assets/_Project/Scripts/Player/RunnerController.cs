@@ -83,6 +83,15 @@ namespace PassportFrenzy
             _invulnTimer = 0f;
             _jumpBufferTimer = 0f;
             _autoMoveX = 0f;
+            SetVisible(true);
+        }
+
+        /// <summary>Hide the character while they're on the plane (boarding). Toggles objects, never alpha: the
+        /// feedback code rewrites the Visual's colour every frame. ResetTo shows them again.</summary>
+        public void SetVisible(bool on)
+        {
+            if (visual != null) visual.gameObject.SetActive(on);
+            if (shieldVisual != null) shieldVisual.SetActive(on && HasShield);
         }
 
         /// <summary>Scripted move input (-1..1) that drives the runner while player input is locked, e.g. the intro.

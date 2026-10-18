@@ -194,6 +194,7 @@ namespace PassportFrenzy.EditorTools
         {
             BuildObstacles();
             BuildFestivalsAndPickups();
+            BuildPlane();
             BuildChunks();
             BuildPlayerAndCamera();
         }

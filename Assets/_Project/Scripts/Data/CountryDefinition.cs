@@ -48,6 +48,12 @@ namespace PassportFrenzy
         [Tooltip("Festival zone used by the debug 'spawn festival' button. Empty = database default.")]
         public FestivalZone festivalZonePrefab;
 
+        [Header("Background (white silhouettes, tinted from the palette by ParallaxBackground)")]
+        [Tooltip("Far landmarks skyline, tileable (Placeholder/Backgrounds/bg_<id>_far). Empty = the layer's default sprite.")]
+        public Sprite backgroundFar;
+        [Tooltip("Nearer rooftops/trees, tileable (Placeholder/Backgrounds/bg_<id>_mid).")]
+        public Sprite backgroundMid;
+
         [Header("Audio")]
         [Tooltip("Optional. If empty, AudioManager looks up 'music_<id>' in the SoundLibrary.")]
         public AudioClip music;

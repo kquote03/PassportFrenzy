@@ -39,6 +39,8 @@ namespace PassportFrenzy
         /// <summary>World X where a reset world's first chunk starts (nothing exists to the left of it).</summary>
         public float StartX => startX;
         public float GateX { get; private set; } = float.NaN;
+        /// <summary>The spawned gate chunk (holds the boarding plane), null until it exists.</summary>
+        public Chunk GateChunk { get; private set; }
         public float ChaseStartX { get; private set; } = float.NaN;
         public float PlannedGateX => float.IsNaN(GateX) ? ChaseStartX + _plannedChaseLength : GateX;
         /// <summary>World X of the airport entrance trigger: exact once spawned, planned before that (NaN outside a country run).</summary>
@@ -73,6 +75,7 @@ namespace PassportFrenzy
             _forced.Clear();
             _nextX = startX;
             GateX = float.NaN;
+            GateChunk = null;
             ChaseStartX = float.NaN;
             _chasePending = false;
             _countryLength = 0f;
@@ -232,6 +235,7 @@ namespace PassportFrenzy
             {
                 var trigger = chunk.GetComponentInChildren<FlowTrigger>();
                 GateX = trigger != null ? trigger.transform.position.x : _nextX + chunk.Length * 0.5f;
+                GateChunk = chunk;
             }
             _nextX += chunk.Length;
             return chunk;

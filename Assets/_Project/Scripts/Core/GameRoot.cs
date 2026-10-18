@@ -28,6 +28,8 @@ namespace PassportFrenzy
         public AudioManager audioManager;
         public BuffSystem buffs;
         public UIRoot ui;
+        [Tooltip("Country parallax backdrop (optional).")]
+        public ParallaxBackground background;
 
         [Header("Player (nested prefab)")]
         public RunnerController player;

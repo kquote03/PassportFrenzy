@@ -42,6 +42,12 @@ Been Modified" dialog. The editor still holds the stale scene overrides **in mem
 
 A fresh clone on another machine doesn't need any of this.
 
+## Branch `feature/plane-departure-parallax` (awaiting the user's playtest)
+Plane boarding/missed-flight animation + procedural parallax backgrounds. See PROGRESS.md (top section) and AGENTS.md §5/§9/§12.
+Merge with `git checkout main && git merge --no-ff feature/plane-departure-parallax` after the playtest; nothing on `main`
+conflicts by design (the branch only adds files and patches prefabs). After merging on a machine with the editor open:
+Ctrl+R, then `Passport Frenzy/Patch Gate Plane + Parallax` is **not** needed (the patched prefabs are committed).
+
 ## Next tasks (agreed with the user, in order)
 The user wants to **playtest after each feature** before the next one starts: implement → verify → stop → wait for feedback → push.
 

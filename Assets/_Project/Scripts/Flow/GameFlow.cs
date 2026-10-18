@@ -18,6 +18,7 @@ namespace PassportFrenzy
 
         readonly System.Random _rng = new System.Random();
         Coroutine _sequence;
+        PlaneDeparture _strayPlane; // the fly-past plane of a missed flight (not a chunk, so we clean it up ourselves)
 
         public GameState State { get; private set; }
         public RunState Run { get; private set; }
@@ -43,7 +44,9 @@ namespace PassportFrenzy
             var home = R.countries.home;
             R.ui.HideOverlays();
             ClosePhone();
+            ClearStrayPlane();
             R.spawner.ResetWorld(SpawnMode.Home, home, 1, R.countries.homeLobbyChunk);
+            if (R.background != null) R.background.SetCountry(home);
             R.player.ResetTo(playerStart);
             R.player.SetRunning(false);
             R.player.ClearRunBuffs();
@@ -274,16 +277,34 @@ namespace PassportFrenzy
         IEnumerator FlySequence()
         {
             SetState(GameState.Flying);
-            Run.FlightTimerActive = false;
+            Run.FlightTimerActive = false; // first: a miss can't fire while boarding
             R.input.SetPhoneMode(false);
             R.input.SetMenuMode(true);
+
+            // Board: run up to the parked plane (the gate chunk nests one), vanish into the jet bridge, watch it leave.
+            var plane = R.spawner.GateChunk != null ? R.spawner.GateChunk.GetComponentInChildren<PlaneDeparture>() : null;
+            if (plane != null)
+            {
+                R.Cam.Hold();
+                float boardX = plane.transform.position.x - T.boardingOffsetX;
+                R.player.SetAutoMove(1f);
+                float safety = T.boardingRunMaxSeconds;
+                while (R.player.transform.position.x < boardX && safety > 0f)
+                {
+                    safety -= Time.deltaTime;
+                    yield return null;
+                }
+                R.player.SetAutoMove(0f);
+            }
             R.player.SetRunning(false);
+            R.player.SetVisible(false); // shown again by ResetTo on landing
 
             int miles = BookingRules.MilesForFlight(T, Run.SecondsThisStay);
             Run.MilesEarned += miles;
             SaveSystem.Data.flightsTaken++;
             SaveSystem.AddMiles(miles);
             R.audioManager.Play(SoundIds.Takeoff);
+            if (plane != null) yield return plane.Play(PlaneFlightCurve.Kind.Takeoff, T.takeoffSeconds);
 
             yield return R.ui.flightTransition.Play(Run.Current, Run.Destination, miles, T.flyingScreenSeconds);
             Land(Run.Destination, Run.DestinationVisaYears);
@@ -305,11 +326,13 @@ namespace PassportFrenzy
             var festivals = FestivalPlanner.Plan(c, R.countries.genericFestivalChunk, length, Run.VisaSecondsTotal, T, _rng);
             Debug.Log($"[Festival] {c.displayName}: {festivals.Count} festival(s) planned over {length:0} m");
             R.spawner.BeginCountry(c, c.difficultyTier, length, festivals, R.countries.arrivalChunk, playerStart.x);
+            ClearStrayPlane();
             R.player.ResetTo(playerStart);
             R.player.SetRunning(true);
             R.Cam.Release();
             R.Cam.SnapToTarget();
             R.Cam.SetBackground(c.skyColor);
+            if (R.background != null) R.background.SetCountry(c);
             R.audioManager.PlayMusic(c);
             R.ui.flightTransition.Hide();
             R.input.SetMenuMode(false);
@@ -329,7 +352,6 @@ namespace PassportFrenzy
             ClosePhone();
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);
-            R.audioManager.Play(SoundIds.FlightMissed);
             SaveSystem.Data.flightsMissed++;
             SaveSystem.Save();
             _sequence = StartCoroutine(MissedSequence());
@@ -337,10 +359,32 @@ namespace PassportFrenzy
 
         IEnumerator MissedSequence()
         {
+            // Your plane leaves without you: a fly-past along the window band while the camera holds still.
+            R.Cam.Hold();
+            var prefab = R.countries.planePrefab;
+            if (prefab != null)
+            {
+                ClearStrayPlane();
+                float hw = R.Cam.HalfWidth;
+                _strayPlane = Instantiate(prefab, new Vector3(R.Cam.CenterX + hw + 5f, T.flyPastY, 0f), Quaternion.identity, R.transform);
+                _strayPlane.ApplyPalette(Run.Current);
+                _strayPlane.Begin(PlaneFlightCurve.Kind.FlyPast, T.takeoffSeconds, 2f * hw + 14f);
+                yield return new WaitForSeconds(0.4f);
+                R.audioManager.Play(SoundIds.FlightMissed);
+                yield return new WaitForSeconds(Mathf.Max(0f, T.takeoffSeconds - 0.4f));
+            }
+            else R.audioManager.Play(SoundIds.FlightMissed);
+
             string dest = Run.Destination != null ? Run.Destination.displayName : "your destination";
             yield return R.ui.missed.Run(dest, Run, T.missedScreenSeconds);
             _sequence = null;
             EnterHome();
+        }
+
+        void ClearStrayPlane()
+        {
+            if (_strayPlane != null) Destroy(_strayPlane.gameObject);
+            _strayPlane = null;
         }
 
         public bool OwnsAllPassports()

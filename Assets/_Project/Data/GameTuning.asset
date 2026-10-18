@@ -41,7 +41,7 @@ MonoBehaviour:
   shopWindowSeconds: 7
   flightTimerPaddingSeconds: 6
   chaseSlackMultiplier: 1.25
-  flyingScreenSeconds: 2.5
+  flyingScreenSeconds: 1.5
   missedScreenSeconds: 3.5
   milesBasePerFlight: 100
   milesPerSecondStayed: 2

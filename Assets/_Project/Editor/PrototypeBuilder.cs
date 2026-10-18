@@ -70,13 +70,16 @@ namespace PassportFrenzy.EditorTools
             finally { AssetDatabase.StopAssetEditing(); }
 
             BuildSprites();
+            GenerateBackgrounds(overwrite);      // parallax silhouettes (Placeholder/Backgrounds)
             AssetDatabase.Refresh();
 
             var data = BuildCoreData();          // tuning, sounds, buffs
-            BuildWorldPrefabs();                 // obstacles, festivals, pickups, chunks, player, camera
+            BuildWorldPrefabs();                 // obstacles, festivals, pickups, plane, chunks, player, camera
             BuildCountries(data);                // countries + database (needs chunks)
             BuildUiPrefabs();                    // UI views + root
             BuildGameRoot(data);                 // systems prefab (needs everything)
+            PatchGateChunk();                    // glass wall + mask + nested plane
+            PatchGameRoot();                     // ParallaxBackground
             BuildScene();
 
             AssetDatabase.SaveAssets();
@@ -92,7 +95,7 @@ namespace PassportFrenzy.EditorTools
                 PrefabsDir + "/Core", PrefabsDir + "/Player", PrefabsDir + "/Obstacles", PrefabsDir + "/Festivals",
                 PrefabsDir + "/Pickups", PrefabsDir + "/UI", PrefabsDir + "/Chunks/Generic", PrefabsDir + "/Chunks/Airport",
                 PrefabsDir + "/Chunks/Home", PrefabsDir + "/Chunks/Spain", PrefabsDir + "/Chunks/Japan", PrefabsDir + "/Chunks/India",
-                Root + "/Scenes",
+                PrefabsDir + "/World", BackgroundsDir, Root + "/Scenes",
             };
             foreach (var d in dirs) EnsureFolder(d);
         }

@@ -24,6 +24,10 @@ The pursuer is the **departing flight**: miss it and the run ends.
 4. **Freezone shop** (phone, every airport): spend miles on one buff. You hold at most one item.
 5. **Airport chase** through crowds to the gate (already running since booking). Terminal length and crowd density scale with the destination's tier.
    Reaching the gate with the phone still open boards anyway (the app is abandoned).
+   **Boarding:** the character runs up to the plane parked behind the gate's glass wall and vanishes into the jet bridge; the
+   plane taxis, pitches up and climbs out of the window (`takeoffSeconds`, clipped by a SpriteMask), then the flight card shows.
+   **Missed flight:** the camera holds while a plane flies past along the window band without you (`flyPastY`), the sad
+   trombone plays, then the MISSED card.
 6. Reach the gate → **fly** → earn miles (scaled by how long you stayed) → land → **country run** (obstacles, crowds, pickups,
    usually **one festival**: 90% one, 5% none, 5% two). The run has a fixed length ending at the country's airport:
    `visa time × run speed × visaDistanceSlack (0.85)`. The **visa timer is the deadline**. If it hits 0 before you reach the
@@ -103,7 +107,8 @@ Assets/_Project/
   Data/               GameTuning.asset, CountryDatabase.asset, SoundLibrary.asset, Countries/, Buffs/
   Input/              PassportFrenzyControls.inputactions (maps: Gameplay, UI, Phone; schemes: KeyboardMouse, Gamepad)
   Placeholder/Sprites Generated white shapes (Square, Circle, Triangle, Capsule), tinted per object
-  Prefabs/            Core, Player, Chunks/{Generic,Airport,Home,Spain,Japan,India}, Obstacles, Festivals, Pickups, UI
+  Placeholder/Backgrounds  Generated parallax silhouettes: bg_<id>_far/_mid per country, bg_clouds, bg_sky (32 x 10 units, 24 PPU)
+  Prefabs/            Core, Player, World (PF_Plane), Chunks/{Generic,Airport,Home,Spain,Japan,India}, Obstacles, Festivals, Pickups, UI
   Scenes/Game.unity
 ```
 
@@ -132,6 +137,13 @@ Assets/_Project/
   (`"{Jump} Jump"` → `[Space] Jump` / `[A] Jump`; phone tokens `{Submit}` `{Mash}` `{PhoneNav}` `{Attach}`; overlays use `{Confirm}`).
 - **Audio**: `AudioManager.Play(SoundIds.X)` and `PlayMusic(country)`. Every hook is a no-op until a clip is assigned in
   `Data/SoundLibrary.asset` (or `CountryDefinition.music`).
+- **ParallaxBackground** (component on `PF_GameRoot`, renderers under its `Background` child; `GameRoot.background`): sky and
+  ground haze glued to the camera plus tiled silhouette layers (clouds 0.05, far 0.15, mid 0.4 of world motion; tile width 32)
+  that connect across chunk seams. `SetCountry(c)` (from `GameFlow.Land`/`EnterHome`) swaps `CountryDefinition.backgroundFar/Mid`
+  and tints them from the palette (`ParallaxMath.LayerTint`). Pure math in `ParallaxMath` (tested).
+- **PlaneDeparture** (`PF_Plane`, logic on the root, primitives under `Visual`, nose right): `Play(kind, seconds)` drives the
+  `PlaneFlightCurve` (`Takeoff` for boarding, `FlyPast` for a missed flight; tested). The gate chunk nests one under its
+  `WindowMask` (SpriteMask, range -17..-14); `ChunkSpawner.GateChunk` exposes it. `CountryDatabase.planePrefab` is spawned for the fly-past.
 - **Events**: `GameEvents` (static) for UI/audio feedback only: toast, photo taken, hit, item changed, passport, miles.
 
 ## 6. Prefab & naming conventions
@@ -141,7 +153,8 @@ Assets/_Project/
   placeholder shapes. Extra visual-only children: `ShieldVisual` (player), `Label` (world TMP text).
 - Chunk pivot = left edge at ground height. Ground top is y = 0. Default chunk length is 24 units. Player jump apex ≈ 2.4 units,
   jump distance ≈ 6 units at base speed. Keep block obstacles ≤ 1.3 high and ≤ 1.5 wide.
-- Sorting orders: background -20…-10, ground 0, props 1–4, obstacles/festivals 5, pickups 6, player 10.
+- Sorting orders: parallax -40…-30 (haze -40, clouds -38, far -35, mid -30), chunk background -20…-10, ground 0, props 1–4,
+  obstacles/festivals 5, pickups 6, player 10. The gate's `WindowMask` clips -17..-14 (the plane at -16/-15).
 - Tune values in the Inspector (prefab fields or `GameTuning`), not in code.
 
 ## 7. Art-swap contract (for the artist / artist's agent)
@@ -188,6 +201,11 @@ Assets/_Project/
   `FestivalPlanner` (not the random chunk pools): signature chunk first (e.g. La Tomatina), distinct names.
 - Flight timer: `GameTuning.FlightSeconds(tier, residencyAhead)` = lobby run + expected chase + `menuOverlapAllowance` (0.4) ×
   phone time after booking + padding (the phone overlaps the chase, so only part of its time is added).
+- Boarding / missed flight: `takeoffSeconds` (2.2, the clip length), `boardingOffsetX`, `boardingRunMaxSeconds`, `flyPastY`,
+  `flyingScreenSeconds` (1.5 now that the plane carries the moment).
+- Parallax: `parallaxFarBlend` / `parallaxMidBlend` (how far the silhouettes move from the sky colour toward the country's
+  primary colour); layer motion/orders on the `ParallaxBackground` component; regenerate the silhouettes with
+  `Passport Frenzy/Generate Country Backgrounds (overwrite)` after editing the recipes in `Editor/PrototypeBuilder.Backgrounds.cs`.
 - Visa deadline: `visaDistanceSlack` (lower = more spare time). `CountryDatabase.fillerChunk` (6 m) lands the airport
   entrance exactly at the end.
 - **Jam Demo Mode** (`jamDemoMode`, also toggled in the debug panel at runtime): 1 year = 6 s, country run ≤ 30 s, chase ≈ 30 s.
@@ -203,6 +221,9 @@ passports), clear save. The header shows the state, device, years in country and
 ## 11. Agent testing notes (Unity MCP)
 - **Auto Refresh is OFF** in this editor (user preference): after editing scripts or assets, run `AssetDatabase.Refresh()`
   via MCP `eval` (or MCP `recompile`), then check `recompile_status` / `console`. Batch your edits first.
+- **Never use MCP `run_tests` here**: it has hung the editor's main thread every time (all later commands time out; only a
+  force-close + relaunch recovers). Run EditMode tests from the Test Runner window, or via `eval` with
+  `UnityEditor.TestTools.TestRunner.Api.TestRunnerApi` and callbacks (asynchronous).
 - Play mode only runs at full speed while the Unity window is the **foreground app**. When unfocused it crawls at about 2 fps
   (`Application.runInBackground` is on, but the editor still throttles). Bring Unity to the front before timing-sensitive tests.
 - `InputSystemSettings.inputsettings.asset` sets background behavior = *Ignore Focus* and editor input = *all devices go to
@@ -230,5 +251,8 @@ passports), clear save. The header shows the state, device, years in country and
 - Never commit a non-compiling project. Update **PROGRESS.md** (done / stubbed / bugs / decisions / next tasks) with each commit.
 - Keep scenes thin: put new things in prefabs/ScriptableObjects, not in `Game.unity`.
 - Don't touch `Assets/Art/`.
+- `Passport Frenzy/Patch Gate Plane + Parallax (safe for art)` re-applies the idempotent prefab patches (gate glass wall + mask +
+  nested `PF_Plane`, `ParallaxBackground` on `PF_GameRoot`, country background sprites, `planePrefab`). `Rebuild ALL` drops
+  both the painted airport wall and these patches (the patches are re-run by `Build`, the wall is not).
 - Regenerating assets: `Passport Frenzy/Build Missing Assets` (safe). `Passport Frenzy/Rebuild Data Assets (safe for art)`
   refills countries, the database and the sound library from code without touching prefabs. `Rebuild ALL` only before art exists, or with the artist's agreement.
