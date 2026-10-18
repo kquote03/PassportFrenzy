@@ -8,8 +8,9 @@ namespace PassportFrenzy
     /// <summary>
     /// Owns the PassportFrenzyControls asset. The UI map is always on (overlay menus, mouse, debug toggle).
     /// The Gameplay map (move/jump/photo/item) is switched off only for full-screen overlays (<see cref="SetMenuMode"/>).
-    /// The phone is used while running (<see cref="SetPhoneMode"/>): gameplay stays live, and the UI module's
-    /// navigate/submit are swapped to the Phone map (right stick + RT) so they never clash with move/jump. The mouse always works.
+    /// The phone is used while running (<see cref="SetPhoneMode"/>): the character auto-runs (GameFlow), Move and Jump are
+    /// switched off, and the UI module's navigate/submit are swapped to the Phone map, so the movement keys / left stick /
+    /// D-pad pick options and Space / Enter / A confirm (right stick + RT and the mouse still work).
     /// </summary>
     public class InputRouter : MonoBehaviour
     {
@@ -68,6 +69,14 @@ namespace PassportFrenzy
             _phoneSubmit = InputActionReference.Create(PhoneSubmit);
         }
 
+        /// <summary>Move and Jump share keys with the phone, so they are off while it is up.</summary>
+        void ApplyPhoneLock()
+        {
+            if (MenuMode) return; // the whole Gameplay map is off anyway
+            if (PhoneMode) { Move.Disable(); Jump.Disable(); }
+            else { Move.Enable(); Jump.Enable(); }
+        }
+
         void OnDestroy()
         {
             _gameplay?.Disable();
@@ -80,14 +89,22 @@ namespace PassportFrenzy
         {
             MenuMode = on;
             if (on) _gameplay.Disable();
-            else _gameplay.Enable();
+            else
+            {
+                _gameplay.Enable();
+                ApplyPhoneLock();
+            }
         }
 
-        /// <summary>Phone mode: keep running; phone navigates with the right stick and selects with RT (or the mouse).</summary>
+        /// <summary>
+        /// Phone mode: the phone takes the movement controls (move keys / left stick / D-pad navigate, Space / Enter / A
+        /// confirm and mash) while the character auto-runs. Photo and Use item stay live.
+        /// </summary>
         public void SetPhoneMode(bool on)
         {
             PhoneMode = on;
             if (on) SetMenuMode(false);
+            ApplyPhoneLock();
             if (_module == null) return;
             _module.move = on ? _phoneMove : _uiMove;
             _module.submit = on ? _phoneSubmit : _uiSubmit;

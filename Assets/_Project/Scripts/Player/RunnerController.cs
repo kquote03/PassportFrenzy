@@ -26,6 +26,7 @@ namespace PassportFrenzy
         float _stumbleTimer, _stumbleDuration = 1f, _stumbleMultiplier = 1f;
         float _boostTimer, _boostMultiplier = 1f;
         float _invulnTimer, _coyoteTimer, _jumpBufferTimer;
+        bool _autoHop;
         float _flashTimer, _runPhase;
         float _moveX, _autoMoveX, _facing = 1f, _furthestX, _leftLimit;
         Vector3 _visualBasePos, _visualBaseScale = Vector3.one;
@@ -83,11 +84,17 @@ namespace PassportFrenzy
             _invulnTimer = 0f;
             _jumpBufferTimer = 0f;
             _autoMoveX = 0f;
+            _autoHop = false;
         }
 
-        /// <summary>Scripted move input (-1..1) that drives the runner while player input is locked, e.g. the intro.
-        /// 0 hands movement back to the player.</summary>
-        public void SetAutoMove(float x) => _autoMoveX = Mathf.Clamp(x, -1f, 1f);
+        /// <summary>Scripted move input (-1..1) that drives the runner while player input is locked (the intro, the phone).
+        /// <paramref name="hopWhenBlocked"/> jumps automatically when a block obstacle stops the runner (the phone has the
+        /// jump button). 0 hands movement back to the player.</summary>
+        public void SetAutoMove(float x, bool hopWhenBlocked = false)
+        {
+            _autoMoveX = Mathf.Clamp(x, -1f, 1f);
+            _autoHop = hopWhenBlocked && _autoMoveX != 0f;
+        }
 
         public void ClearRunBuffs()
         {
@@ -99,6 +106,7 @@ namespace PassportFrenzy
         {
             var input = GameRoot.I.input;
             if (input.Jump.WasPressedThisFrame()) _jumpBufferTimer = T.jumpBufferTime;
+            if (_autoHop && Blocked && Grounded) _jumpBufferTimer = T.jumpBufferTime;
             _moveX = _autoMoveX != 0f ? _autoMoveX : Running && !input.MenuMode ? input.Move.ReadValue<Vector2>().x : 0f;
             if (Mathf.Abs(_moveX) < 0.2f) _moveX = 0f;
 

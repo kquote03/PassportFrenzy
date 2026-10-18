@@ -41,14 +41,18 @@ The pursuer is the **departing flight**: miss it and the run ends.
 | Jump | Space / W / ↑ | A (South) |
 | Photo | F / right mouse | X (West) |
 | Use item | E / Q | Y (North) |
-| Phone navigate / select (while running) | Mouse only (click) | Right stick, RT |
-| Mash (residency form) | Spam left click (anywhere) | RT |
-| Attach photo | Drag onto paper | Flick right stick right |
+| Phone navigate (while it's up) | W/S/A/D, arrows, mouse | Left stick, D-pad (right stick still works) |
+| Phone select | Space / Enter, click | A (RT still works) |
+| Mash (residency form) | Space / Enter, or spam left click | A or RT |
+| Attach photo | D / → or drag onto paper | Push the left stick right (or flick the right stick) |
 | Overlay menus (home, missed, win) navigate / confirm | Arrows/WASD, Space/Enter, mouse | Stick/D-pad, A |
 | Debug panel | F1 | Select |
 
-The phone never uses the movement/jump controls, so you can run and use it at the same time. Full-screen overlays (home,
-flying, missed, won) still disable the Gameplay map.
+**While the phone is up the character runs by itself** (`RunnerController.SetAutoMove`, through `GameFlow.SetPhone`) and
+hops blocking obstacles automatically; slow obstacles still trip you. Move and Jump are switched off (`InputRouter.SetPhoneMode`)
+so the same keys / stick drive the phone; Photo and Use item stay live. Closing the phone hands the controls back.
+Full-screen overlays (home, flying, missed, won) still disable the Gameplay map. The main menu fades out on Play
+(`MainMenuView.fadeSeconds`).
 
 ### Movement
 No auto-scroll: **move with A/D or ←/→, the left stick, or the D-pad** (W/↑/Space/A jump). Adopted on `main` after the
@@ -159,8 +163,9 @@ Assets/_Project/
    `frames` / `idleFrames` / `jumpFrames` lists; Procedural Animation is off.
    Obstacles with artist art: `PF_Obstacle_Suitcase` (`Assets/Art/SuitCases`, a random colour per spawn through
    `RandomSpriteVariant`), `PF_Obstacle_Cone`, `PF_Obstacle_Barrier`, `PF_Obstacle_LuggageCart`, `PF_Obstacle_Puddle` and
-   `PF_Obstacle_WetFloor` (`Assets/Art/TrafficCone`, `Barrier`, `LuggageCart`, `Puddle`, `WetFloorSign`). These reference the
-   importer's sliced sprites (`<Name>_0`), so commit the art's `.meta` files with it.
+   `PF_Obstacle_WetFloor` (`Assets/Art/TrafficCone`, `Barrier`, `LuggageCart`, `Puddle`, `WetFloorSign`), `PF_Crowd_Airport`
+   (`Assets/Art/AirportCrowd`) and the `Backdrop/Wall` of `PF_Chunk_Home_Lobby` / `PF_Chunk_Home_Door` (`Assets/Art/DubaiAirport`).
+   These reference the importer's sliced sprites (`<Name>_0`), so commit the art's `.meta` files with it.
 6. UI: phone/menu prefabs are in `Prefabs/UI`. Swap Image sprites and TMP fonts freely. Don't rename objects that scripts
    reference through serialized fields (re-link them in the Inspector if you do).
 7. **Never run `Passport Frenzy/Rebuild ALL (overwrites)`** after you've started swapping art: it regenerates every prefab from code.

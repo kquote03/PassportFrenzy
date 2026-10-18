@@ -15,13 +15,13 @@ namespace PassportFrenzy
             ("{Jump}", "[Space]", "[A]"),
             ("{Photo}", "[F]", "[X]"),
             ("{Use}", "[E]", "[Y]"),
-            ("{Mash}", "[Left Click]", "[RT]"),
-            ("{Submit}", "[Click]", "[RT]"),
-            ("{PhoneNav}", "[Mouse]", "[R-Stick]"),
-            ("{PhoneControls}", "[Mouse]", "[R-Stick]+[RT]"),
+            ("{Mash}", "[Space]", "[A]"),
+            ("{Submit}", "[Space]", "[A]"),
+            ("{PhoneNav}", "[W/S]", "[L-Stick]"),
+            ("{PhoneControls}", "[W/S]+[Space]", "[L-Stick]+[A]"),
             ("{Confirm}", "[Space/Enter]", "[A]"),
             ("{Debug}", "[F1]", "[Select]"),
-            ("{Attach}", "Drag photos onto the paper", "Flick [R-Stick] right"),
+            ("{Attach}", "Press [D] or drag photos onto the paper", "Push [L-Stick] right"),
         };
 
         public static string Format(string template)

@@ -100,9 +100,10 @@ namespace PassportFrenzy
             R.Cam.Release();
             yield return new WaitForSeconds(T.introFollowSeconds);
 
-            R.player.SetAutoMove(0f);
             R.input.SetMenuMode(false);
-            _sequence = StartCoroutine(AirportSequence()); // the phone comes up; the home door is just scenery now
+            // The phone comes up and keeps the character running (SetPhone), so there's no stop between the two.
+            // The home door is just scenery now.
+            _sequence = StartCoroutine(AirportSequence());
         }
 
         // ------------------------------------------------------------------ Per-frame timers
@@ -185,7 +186,7 @@ namespace PassportFrenzy
         IEnumerator AirportSequence()
         {
             var here = Run.Current;
-            R.input.SetPhoneMode(true); // keep running: phone on the right stick + RT, or the mouse
+            SetPhone(true); // the character keeps running; the movement controls drive the phone
             R.player.GetComponent<PlayerInteractions>().ClearZone();
 
             // 1. Booking in the lobby (menu hell: pick within the window or get a random one)
@@ -260,7 +261,17 @@ namespace PassportFrenzy
         void ClosePhone()
         {
             R.ui.phone.Close();
-            R.input.SetPhoneMode(false);
+            SetPhone(false);
+        }
+
+        /// <summary>
+        /// While the phone is up the character runs by itself (hopping blocking obstacles) and the movement controls
+        /// pick options on the phone instead. Closing it hands the controls back.
+        /// </summary>
+        void SetPhone(bool on)
+        {
+            R.input.SetPhoneMode(on);
+            R.player.SetAutoMove(on ? 1f : 0f, hopWhenBlocked: on);
         }
 
         void StartFlightTimer(bool residencyAhead)
@@ -275,7 +286,7 @@ namespace PassportFrenzy
         {
             SetState(GameState.Flying);
             Run.FlightTimerActive = false;
-            R.input.SetPhoneMode(false);
+            SetPhone(false);
             R.input.SetMenuMode(true);
             R.player.SetRunning(false);
 

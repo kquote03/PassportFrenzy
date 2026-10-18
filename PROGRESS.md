@@ -41,6 +41,27 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Regenerate with `python Tools/sfx/generate_sfx.py` (Python standard library only, deterministic). Levels are balanced
   (peaks about -3 dBFS, quieter for the jump/mash/alarm sounds). Music hooks (`music_<countryId>`) are still empty.
 
+## Phone takes the controls, menu fade, airport crowd + Dubai art (awaiting user playtest)
+- [x] **Auto-run while the phone is up:** `GameFlow.SetPhone(on)` = `InputRouter.SetPhoneMode` + `RunnerController.SetAutoMove(1,
+  hopWhenBlocked)`; used when the phone opens (`AirportSequence`) and closes (`ClosePhone`, `FlySequence`). The intro hands
+  straight over, so the character never stops between the run-in and the booking.
+  - The runner jumps by itself when a block obstacle stops it (`_autoHop`); slow obstacles still trip it.
+- [x] **The phone takes the movement controls:** Phone map gained W/S/A/D + arrows + left stick + D-pad (Navigate),
+  Space / Enter / numpad Enter / A (Submit), Space / Enter / A (Mash). Right stick, RT and the mouse still work.
+  `SetPhoneMode` disables Gameplay Move and Jump (re-applied after `SetMenuMode(false)`); Photo / Use item stay live.
+  Residency photo attach: D / → / left stick right (it reads `PhoneNavigate.x`). Prompts updated (`InputPrompts`).
+- [x] **Main menu fades out** on Play (`MainMenuView.Hide`, CanvasGroup, `fadeSeconds` 0.45, unscaled). Clicks are ignored
+  from the first frame of the fade; the intro run starts underneath.
+- [x] **Luggage cart = half the player's height:** Visual scale 0.629 → 1.9 × 3.0 units; hitbox 2.0 × 1.3 at (-0.18, 0.65)
+  over the bags (1.3 = jumpable block limit). Chase chunk spacing checked (no overlaps).
+- [x] **Airport crowd art:** `PF_Crowd_Airport/Visual` = `Assets/Art/AirportCrowd` (black silhouettes) at 125 px/unit
+  (scale 0.8): 7.0 × 4.6 units. The tallest figure is about 4.6 units, a bit taller than the player (3.8). The 26
+  placeholder Person/Head/Bag parts are removed; the trigger zone is unchanged (7 × 2.4).
+- [x] **Dubai duty-free panorama** (`Assets/Art/DubaiAirport`) is the `Backdrop/Wall` of `PF_Chunk_Home_Lobby` and
+  `PF_Chunk_Home_Door`: scale 1.434 (26 × 12.45 units, a little wider than the chunk so no sky shows), its floor line on y = 0.
+  It isn't seamlessly tileable, so it's only used at home; the terminal chunks keep the old wall.
+- Verified: Runtime, Editor and EditMode test assemblies compile with Unity's bundled Roslyn (0 errors). Not yet run in Unity.
+
 ## Demo rotation, Play intro, final-call announcement (awaiting user playtest)
 - [x] **3-country demo rotation:** `CountryDatabase.demoRotationOnly` (on) + `demoDestinations` = USA, Japan, India.
   Booking, the win check, debug "win", HUD / menu / win-screen passport counts all read `ActiveDestinations` / `CountOwned`
