@@ -46,6 +46,8 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
   native size, top centre, 42 px left of centre as in the PSD) and the `Play` button using `PlayButton.png` (724×116, centred
   874 px from the top; its Label/Icon hidden, the controller SelectRing kept). The dark board, text title, subtitle and
   tagline are off. The passport card is a small cream pill under PLAY: "Passports x/3     Miles n". The Panel dim stays.
+- [x] The logo floats: `UIFloat` on `PF_UI_MainMenu/Logo` drifts it 18 px down and back up every 3.5 s (eased, unscaled time;
+  it never rises above its placed spot, so the top stays on screen). Tune `distance` / `period` on the component.
 - [x] **Crowd bounce:** jumping into a crowd from outside bounces you up and over it.
   `RunnerController.CrowdBounceVelocity` gives the vertical speed that clears the rest of the crowd at the current speed,
   clamped to `crowdBounceMin..Max` (12..19); no crowd slow until you land. Walking in, or jumping from inside, still slows

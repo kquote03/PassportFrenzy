@@ -1637,6 +1637,7 @@ GameObject:
   - component: {fileID: 3080986127317308196}
   - component: {fileID: 987196918507159925}
   - component: {fileID: 2268806941800739365}
+  - component: {fileID: 6097823064099895311}
   m_Layer: 5
   m_Name: Logo
   m_TagString: Untagged
@@ -1701,3 +1702,17 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6097823064099895311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7629787935044346474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a86bbd6a844de6a4e1daf0d300045a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PassportFrenzy.Runtime::PassportFrenzy.UIFloat
+  distance: 18
+  period: 3.5
