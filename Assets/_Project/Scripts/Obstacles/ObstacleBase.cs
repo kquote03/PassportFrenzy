@@ -14,6 +14,9 @@ namespace PassportFrenzy
 
         bool _used;
 
+        /// <summary>Already hit (or absorbed by the shield).</summary>
+        public bool Used => _used;
+
         protected abstract bool ApplyHit(RunnerController runner);
 
         /// <summary>Make the obstacle hittable again (free-movement mode: you backed off instead of jumping).</summary>

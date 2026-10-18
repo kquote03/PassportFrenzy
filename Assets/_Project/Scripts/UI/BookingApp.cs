@@ -29,7 +29,7 @@ namespace PassportFrenzy
                 int index = i;
                 cards[i].Bind(options[i], spy, SaveSystem.Data.Owns(options[i].country.id), () => chosen ??= index);
             }
-            hintText.text = InputPrompts.Format("Pick fast! {Submit} to book");
+            hintText.text = InputPrompts.Format("Pick fast! {PhoneNav} choose  {Submit} book");
             float t = window;
             bool selected = false;
             while (chosen == null && t > 0f)

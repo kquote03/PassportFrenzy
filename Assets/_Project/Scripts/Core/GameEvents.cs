@@ -29,6 +29,8 @@ namespace PassportFrenzy
         public static event Action<string> PassportGranted;
         public static event Action MilesChanged;
         public static event Action<FestivalZone> FestivalInRange; // null = left zone
+        public static event Action<bool> Jumped;      // true = the player pressed jump (not an automatic hop)
+        public static event Action CrowdBounced;
 
         // Project has "Enter Play Mode: no domain reload", so statics must be cleared by hand.
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -36,6 +38,7 @@ namespace PassportFrenzy
         {
             StateChanged = null; Toast = null; Announcement = null; PhotoTaken = null; PlayerHit = null;
             ItemChanged = null; PassportGranted = null; MilesChanged = null; FestivalInRange = null;
+            Jumped = null; CrowdBounced = null;
         }
 
         public static void RaiseStateChanged(GameState s) => StateChanged?.Invoke(s);
@@ -47,6 +50,8 @@ namespace PassportFrenzy
         public static void RaisePassportGranted(string id) => PassportGranted?.Invoke(id);
         public static void RaiseMilesChanged() => MilesChanged?.Invoke();
         public static void RaiseFestivalInRange(FestivalZone z) => FestivalInRange?.Invoke(z);
+        public static void RaiseJumped(bool manual) => Jumped?.Invoke(manual);
+        public static void RaiseCrowdBounced() => CrowdBounced?.Invoke();
     }
 
     public enum HitKind { Slow, Block }

@@ -25,6 +25,9 @@ namespace PassportFrenzy
         [SerializeField] float announcementFontScale = 1.6f;
         [Tooltip("Banner position below the top of the screen (the toast sits at about -206).")]
         [SerializeField] float announcementY = -290f;
+        [Header("Control hint line (built from the toast at runtime)")]
+        [Tooltip("Hint position above the bottom of the screen.")]
+        [SerializeField] float hintY = 90f;
 
         readonly Queue<string> _toasts = new Queue<string>();
         float _toastTimer;
@@ -33,25 +36,38 @@ namespace PassportFrenzy
         CanvasGroup _announceGroup;
         TMP_Text _announceText;
         float _announceTimer, _announceSeconds;
+        readonly ControlHints _hints = new ControlHints();
+        CanvasGroup _hintGroup;
+        TMP_Text _hintText;
+        string _hintRaw;
 
-        void Awake() => BuildAnnouncement();
+        void Awake()
+        {
+            _announceText = CloneToast("Announcement", 1f, announcementY, 220f, announcementFontScale, out _announce, out _announceGroup);
+            _announceText.lineSpacing = -10f;
+            _hintText = CloneToast("ControlHint", 0f, hintY, 90f, 1f, out var hintRect, out _hintGroup);
+            _hintGroup.alpha = 0f;
+            hintRect.gameObject.SetActive(true);
+        }
 
         /// <summary>
-        /// Clones the toast label and its pill into a bigger banner, so it matches the HUD style without a prefab change.
+        /// Clones the toast label and its pill into a new HUD line (anchored at the top or bottom centre), so it matches the
+        /// HUD style without a prefab change. Returns the label; the container starts inactive.
         /// </summary>
-        void BuildAnnouncement()
+        TMP_Text CloneToast(string name, float anchorY, float y, float height, float fontScale, out RectTransform container,
+            out CanvasGroup group)
         {
             var parent = toastText.transform.parent;
-            var go = new GameObject("Announcement", typeof(RectTransform), typeof(CanvasGroup));
-            _announce = (RectTransform)go.transform;
-            _announce.SetParent(parent, false);
-            _announce.SetSiblingIndex(toastText.transform.GetSiblingIndex() + 1);
-            _announce.anchorMin = _announce.anchorMax = _announce.pivot = new Vector2(0.5f, 1f);
-            _announce.anchoredPosition = new Vector2(0f, announcementY);
-            _announce.sizeDelta = new Vector2(toastText.rectTransform.sizeDelta.x, 220f);
-            _announceGroup = go.GetComponent<CanvasGroup>();
-            _announceGroup.blocksRaycasts = false;
-            _announceGroup.interactable = false;
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasGroup));
+            container = (RectTransform)go.transform;
+            container.SetParent(parent, false);
+            container.SetSiblingIndex(toastText.transform.GetSiblingIndex() + 1);
+            container.anchorMin = container.anchorMax = container.pivot = new Vector2(0.5f, anchorY);
+            container.anchoredPosition = new Vector2(0f, y);
+            container.sizeDelta = new Vector2(toastText.rectTransform.sizeDelta.x, height);
+            group = go.GetComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
 
             TextBackdrop pill = null;
             foreach (Transform sibling in parent)
@@ -59,19 +75,31 @@ namespace PassportFrenzy
                 var b = sibling.GetComponent<TextBackdrop>();
                 if (b != null && b.Target == toastText) { pill = b; break; }
             }
-            if (pill != null) Instantiate(pill.gameObject, _announce, false).name = "AnnouncementBackdrop";
+            if (pill != null) Instantiate(pill.gameObject, container, false).name = name + "Backdrop";
 
-            _announceText = Instantiate(toastText.gameObject, _announce, false).GetComponent<TMP_Text>();
-            _announceText.name = "AnnouncementText";
-            var rt = _announceText.rectTransform;
+            var label = Instantiate(toastText.gameObject, container, false).GetComponent<TMP_Text>();
+            label.name = name + "Text";
+            var rt = label.rectTransform;
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
-            rt.sizeDelta = _announce.sizeDelta;
-            _announceText.fontSize = toastText.fontSize * announcementFontScale;
-            _announceText.lineSpacing = -10f;
-            _announceText.gameObject.SetActive(true);
-            if (pill != null) _announce.GetComponentInChildren<TextBackdrop>().Target = _announceText;
+            rt.sizeDelta = container.sizeDelta;
+            label.fontSize = toastText.fontSize * fontScale;
+            label.text = "";
+            label.gameObject.SetActive(true);
+            if (pill != null) container.GetComponentInChildren<TextBackdrop>().Target = label;
             go.SetActive(false);
+            return label;
+        }
+
+        /// <summary>Shows the current control hint: a new hint waits for the old one to fade out, then fades in.</summary>
+        void UpdateHint()
+        {
+            string want = _hints.Tick(Time.deltaTime);
+            float target = 0f;
+            if (want == _hintRaw) target = want != null ? 1f : 0f;
+            else if (_hintGroup.alpha <= 0f) _hintRaw = want; // swap while invisible
+            _hintText.text = _hintRaw != null ? InputPrompts.Format(_hintRaw) : ""; // the device can change at any time
+            _hintGroup.alpha = Mathf.MoveTowards(_hintGroup.alpha, target, Time.unscaledDeltaTime * 5f);
         }
 
         void OnAnnouncement(string msg, float seconds)
@@ -101,6 +129,8 @@ namespace PassportFrenzy
             GameEvents.Announcement += OnAnnouncement;
             GameEvents.FestivalInRange += OnFestival;
             GameEvents.PhotoTaken += OnPhoto;
+            GameEvents.Jumped += _hints.OnJumped;
+            GameEvents.CrowdBounced += _hints.OnCrowdBounced;
             toastText.gameObject.SetActive(false);
             promptText.gameObject.SetActive(false);
             SetFlash(0f);
@@ -112,6 +142,8 @@ namespace PassportFrenzy
             GameEvents.Announcement -= OnAnnouncement;
             GameEvents.FestivalInRange -= OnFestival;
             GameEvents.PhotoTaken -= OnPhoto;
+            GameEvents.Jumped -= _hints.OnJumped;
+            GameEvents.CrowdBounced -= _hints.OnCrowdBounced;
         }
 
         void OnToast(string msg)
@@ -135,6 +167,7 @@ namespace PassportFrenzy
         {
             UpdateToast();
             UpdateAnnouncement();
+            UpdateHint();
             if (photoFlash.color.a > 0f) SetFlash(Mathf.MoveTowards(photoFlash.color.a, 0f, Time.deltaTime * 3f));
 
             var root = GameRoot.I;

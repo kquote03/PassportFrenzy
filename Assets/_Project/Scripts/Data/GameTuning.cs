@@ -52,10 +52,18 @@ namespace PassportFrenzy
         public float stumbleRecoverSeconds = 2f;
         [Tooltip("Default crowd slow multiplier (a CrowdZone can override).")]
         [Range(0.05f, 1f)] public float crowdSpeedMultiplier = 0.55f;
+        [Tooltip("Jumping into a crowd from outside bounces you over it if your feet are at least this high.")]
+        public float crowdBounceMinHeight = 0.4f;
+        [Tooltip("Crowd bounce vertical speed range (the exact value is what it takes to clear the rest of the crowd).")]
+        public float crowdBounceMin = 12f;
+        public float crowdBounceMax = 19f;
         public float hitInvulnerabilitySeconds = 0.6f;
 
         [Header("Buffs")]
         public float speedBoostMultiplier = 1.6f;
+
+        [Header("Control hints (each shows until the player has done it once per session)")]
+        public bool showHints = true;
 
         [Header("Intro (Play: run in from the left, camera follows, phone comes up)")]
         [Tooltip("Off = the old start: the player waits in the lobby and the phone opens at the home door.")]

@@ -68,6 +68,17 @@ namespace PassportFrenzy.Tests
             Assert.AreEqual(3, fromHome.Count);
         }
 
+        [Test]
+        public void CrowdBounce_ClearsTheRestOfTheCrowd_WithinLimits()
+        {
+            const float g = 34.335f; // 9.81 x gravityScale 3.5
+            // 7.6 m to cross at 8 m/s: 0.95 s in the air -> vy = g * t / 2.
+            Assert.AreEqual(g * 0.95f * 0.5f, RunnerController.CrowdBounceVelocity(7.6f, 8f, g, 12f, 19f), 0.01f);
+            Assert.AreEqual(12f, RunnerController.CrowdBounceVelocity(1f, 8f, g, 12f, 19f));   // almost through: still a real hop
+            Assert.AreEqual(19f, RunnerController.CrowdBounceVelocity(30f, 8f, g, 12f, 19f));  // capped
+            Assert.AreEqual(19f, RunnerController.CrowdBounceVelocity(5f, 0f, g, 12f, 19f));   // standing still: no divide by zero
+        }
+
         [TearDown]
         public void TearDown()
         {

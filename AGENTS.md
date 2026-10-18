@@ -125,7 +125,10 @@ Assets/_Project/
 - **Chunk children opt into behaviour** with components: `PaletteTint` (country colors), `DensityGated` (tier thins obstacles/crowds),
   `PickupSocket` (rare buff), `FestivalZone` (photo op), `FlowTrigger` (door / airport entrance / gate).
 - **Obstacles** are trigger-based (`ObstacleBase`), with low triggers you jump over. `SlowObstacle` = stumble (speed dip, recovers
-  over about 2 s). `BlockObstacle` = speed 0 until you jump. `CrowdZone` = continuous slow while overlapping (unavoidable; the shield doesn't help).
+  over about 2 s). `BlockObstacle` = speed 0 until you jump. `CrowdZone` = continuous slow while overlapping (the shield doesn't help).
+  **Crowd bounce:** jumping into a crowd from outside (airborne, feet ≥ `crowdBounceMinHeight`) bounces you up and over
+  it (`RunnerController.CrowdBounce`: just enough vertical speed to clear the rest of the crowd, clamped to
+  `crowdBounceMin..Max`, no slowdown until you land). Walking in, or jumping while already inside, keeps the slow.
 - **Buffs** are ScriptableObjects (`BuffDefinition` subclasses). Passive ones (Shield) apply on acquire; others go into the single item slot.
   The same assets serve the shop and pickups.
 - **UI** uses uGUI prefabs. HUD and FlightBoard poll state each frame. Phone apps are coroutines that GameFlow `yield return`s on.
@@ -165,6 +168,8 @@ Assets/_Project/
    `RandomSpriteVariant`), `PF_Obstacle_Cone`, `PF_Obstacle_Barrier`, `PF_Obstacle_LuggageCart`, `PF_Obstacle_Puddle` and
    `PF_Obstacle_WetFloor` (`Assets/Art/TrafficCone`, `Barrier`, `LuggageCart`, `Puddle`, `WetFloorSign`), `PF_Crowd_Airport`
    (`Assets/Art/AirportCrowd`) and the `Backdrop/Wall` of `PF_Chunk_Home_Lobby` / `PF_Chunk_Home_Door` (`Assets/Art/DubaiAirport`).
+   Main menu (`PF_UI_MainMenu`): `Logo` and the `Play` button use `Assets/Art/MainMenu`, laid out like the artist's
+   `PassportFrenzyMainMenu.psd` (1920×1080, same as the canvas reference).
    These reference the importer's sliced sprites (`<Name>_0`), so commit the art's `.meta` files with it.
 6. UI: phone/menu prefabs are in `Prefabs/UI`. Swap Image sprites and TMP fonts freely. Don't rename objects that scripts
    reference through serialized fields (re-link them in the Inspector if you do).
@@ -196,6 +201,8 @@ Assets/_Project/
 - Visa deadline: `visaDistanceSlack` (lower = more spare time). `CountryDatabase.fillerChunk` (6 m) lands the airport
   entrance exactly at the end.
 - **Jam Demo Mode** (`jamDemoMode`, also toggled in the debug panel at runtime): 1 year = 6 s, country run ≤ 30 s, chase ≈ 30 s.
+- **Control hints** (`showHints`): one bottom-centre hint at a time, each until the player has done it once per session
+  (`UI/ControlHints.cs`): W/S + Space on the phone, jump over obstacles and crowds, hold D to keep running.
 - **Intro** (`playIntro`, `introOffscreenMargin`, `introFollowSeconds`) and the final-call banner (`announcementSeconds`;
   position and size on `HudView`: `announcementY`, `announcementFontScale`).
 - Per-obstacle overrides are on the prefab (`SlowObstacle.stumbleMultiplier`, `CrowdZone.speedMultiplier`, `DensityGated.baseChance`).

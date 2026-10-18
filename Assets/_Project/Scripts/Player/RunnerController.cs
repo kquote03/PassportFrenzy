@@ -26,7 +26,7 @@ namespace PassportFrenzy
         float _stumbleTimer, _stumbleDuration = 1f, _stumbleMultiplier = 1f;
         float _boostTimer, _boostMultiplier = 1f;
         float _invulnTimer, _coyoteTimer, _jumpBufferTimer;
-        bool _autoHop;
+        bool _autoHop, _jumpFromInput, _crowdBouncing;
         float _flashTimer, _runPhase;
         float _moveX, _autoMoveX, _facing = 1f, _furthestX, _leftLimit;
         Vector3 _visualBasePos, _visualBaseScale = Vector3.one;
@@ -41,6 +41,8 @@ namespace PassportFrenzy
         public float CurrentSpeed { get; private set; }
         public float VerticalSpeed => _rb != null ? _rb.linearVelocity.y : 0f;
         public bool InCrowd => _crowds.Count > 0;
+        /// <summary>A script is driving the runner (intro, phone); the player's move/jump input is not in charge.</summary>
+        public bool AutoMoving => _autoMoveX != 0f;
 
         GameTuning T => GameRoot.I.tuning;
 
@@ -78,6 +80,7 @@ namespace PassportFrenzy
             _leftLimit = position.x - 8f; // chunks start ~10 m behind the spawn point
             _facing = 1f;
             _crowds.Clear();
+            _crowdBouncing = false;
             Blocked = false;
             _stumbleTimer = 0f;
             _boostTimer = 0f;
@@ -105,8 +108,8 @@ namespace PassportFrenzy
         void Update()
         {
             var input = GameRoot.I.input;
-            if (input.Jump.WasPressedThisFrame()) _jumpBufferTimer = T.jumpBufferTime;
-            if (_autoHop && Blocked && Grounded) _jumpBufferTimer = T.jumpBufferTime;
+            if (input.Jump.WasPressedThisFrame()) { _jumpBufferTimer = T.jumpBufferTime; _jumpFromInput = true; }
+            if (_autoHop && Blocked && Grounded) { _jumpBufferTimer = T.jumpBufferTime; _jumpFromInput = false; }
             _moveX = _autoMoveX != 0f ? _autoMoveX : Running && !input.MenuMode ? input.Move.ReadValue<Vector2>().x : 0f;
             if (Mathf.Abs(_moveX) < 0.2f) _moveX = 0f;
 
@@ -127,6 +130,7 @@ namespace PassportFrenzy
         {
             Grounded = _rb.IsTouching(_groundFilter);
             if (Grounded) _coyoteTimer = T.coyoteTime;
+            if (_crowdBouncing && Grounded && _rb.linearVelocity.y <= 0.01f) _crowdBouncing = false;
 
             if (T.autoRun)
             {
@@ -159,7 +163,7 @@ namespace PassportFrenzy
                 float t = 1f - _stumbleTimer / _stumbleDuration; // 0 just hit -> 1 recovered
                 speed *= Mathf.Lerp(_stumbleMultiplier, 1f, t * t);
             }
-            if (_crowds.Count > 0)
+            if (_crowds.Count > 0 && !_crowdBouncing) // sailing over a crowd after bouncing off it: no slowdown
             {
                 float m = 1f;
                 foreach (var c in _crowds) if (c != null) m = Mathf.Min(m, c.Multiplier);
@@ -177,6 +181,36 @@ namespace PassportFrenzy
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, T.jumpVelocity);
             GameRoot.I.audioManager.Play(SoundIds.Jump);
             if (visual != null) visual.localScale = Vector3.Scale(FacingScale, new Vector3(0.8f, 1.2f, 1f));
+            GameEvents.RaiseJumped(_jumpFromInput);
+            _jumpFromInput = false;
+        }
+
+        /// <summary>
+        /// Vertical speed that carries a runner over the rest of a crowd: the time to cross <paramref name="distance"/> at
+        /// <paramref name="speedX"/>, as a symmetric arc under <paramref name="gravity"/>, clamped to [min, max].
+        /// </summary>
+        public static float CrowdBounceVelocity(float distance, float speedX, float gravity, float min, float max)
+        {
+            float t = Mathf.Max(0f, distance) / Mathf.Max(0.01f, speedX);
+            return Mathf.Clamp(gravity * t * 0.5f, min, max);
+        }
+
+        /// <summary>Jumped into a crowd from outside: bounce off their heads and over to the far side.</summary>
+        void CrowdBounce(CrowdZone zone)
+        {
+            var v = _rb.linearVelocity;
+            float dir = v.x >= 0f ? 1f : -1f;
+            var b = zone.Bounds;
+            float far = dir > 0f ? b.max.x : b.min.x;
+            float distance = Mathf.Abs(far - _rb.position.x) + 0.6f; // + the runner's own width
+            float speedX = Mathf.Max(Mathf.Abs(v.x), T.baseRunSpeed * 0.5f);
+            float gravity = -Physics2D.gravity.y * _rb.gravityScale;
+            float vy = CrowdBounceVelocity(distance, speedX, gravity, T.crowdBounceMin, T.crowdBounceMax);
+            _rb.linearVelocity = new Vector2(dir * speedX, vy);
+            _crowdBouncing = true;
+            GameRoot.I.audioManager.Play(SoundIds.Jump);
+            if (visual != null) visual.localScale = Vector3.Scale(FacingScale, new Vector3(1.25f, 0.75f, 1f));
+            GameEvents.RaiseCrowdBounced();
         }
 
         /// <summary>Obstacle hit. Returns true if the hit was handled (applied or absorbed by shield).</summary>
@@ -214,7 +248,18 @@ namespace PassportFrenzy
 
         public void ClearBlocked() => Blocked = false;
 
-        public void EnterCrowd(CrowdZone zone) { if (!_crowds.Contains(zone)) _crowds.Add(zone); }
+        /// <summary>
+        /// Walking into a crowd slows you. Jumping into it from outside (airborne, feet up off the ground) bounces you over
+        /// it; jumping while already inside does not.
+        /// </summary>
+        public void EnterCrowd(CrowdZone zone)
+        {
+            if (_crowds.Contains(zone)) return;
+            bool fromOutside = _crowds.Count == 0 || _crowdBouncing;
+            if (fromOutside && Running && !Grounded && _rb.position.y >= zone.Bounds.min.y + T.crowdBounceMinHeight)
+                CrowdBounce(zone);
+            _crowds.Add(zone);
+        }
         public void ExitCrowd(CrowdZone zone) => _crowds.Remove(zone);
 
         public void SetShield(bool on)

@@ -41,6 +41,24 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Regenerate with `python Tools/sfx/generate_sfx.py` (Python standard library only, deterministic). Levels are balanced
   (peaks about -3 dBFS, quieter for the jump/mash/alarm sounds). Music hooks (`music_<countryId>`) are still empty.
 
+## Logo menu, crowd bounce, first-run control hints (awaiting user playtest)
+- [x] **Main menu = the artist's mock-up** (`Assets/Art/MainMenu/PassportFrenzyMainMenu.psd`): new `Logo` Image (1576×851,
+  native size, top centre, 42 px left of centre as in the PSD) and the `Play` button using `PlayButton.png` (724×116, centred
+  874 px from the top; its Label/Icon hidden, the controller SelectRing kept). The dark board, text title, subtitle and
+  tagline are off. The passport card is a small cream pill under PLAY: "Passports x/3     Miles n". The Panel dim stays.
+- [x] **Crowd bounce:** jumping into a crowd from outside bounces you up and over it.
+  `RunnerController.CrowdBounceVelocity` gives the vertical speed that clears the rest of the crowd at the current speed,
+  clamped to `crowdBounceMin..Max` (12..19); no crowd slow until you land. Walking in, or jumping from inside, still slows
+  you. EditMode test: `CrowdBounce_ClearsTheRestOfTheCrowd_WithinLimits`.
+- [x] **Control hints** (`GameTuning.showHints`, `UI/ControlHints.cs`, drawn by `HudView` as a bottom-centre pill cloned
+  from the toast):
+  - Phone, while booking/shopping: "[W/S] Move up / down  [Space] Select". Done after the first phone select.
+  - Jump, when an unused obstacle or a crowd is 1–8 m ahead: "[Space] Jump over obstacles and crowds". Done after a jump
+    while it's up, or a crowd bounce.
+  - Run, after 0.6 s standing still with the controls: "Hold [D] to keep running". Done after holding right for 1 s.
+  - Each shows once per session (static flags reset on play). Gamepad wording is automatic.
+- Verified: Runtime, Editor and EditMode test assemblies compile with Unity's bundled Roslyn (0 errors). Not yet run in Unity.
+
 ## Phone takes the controls, menu fade, airport crowd + Dubai art (awaiting user playtest)
 - [x] **Auto-run while the phone is up:** `GameFlow.SetPhone(on)` = `InputRouter.SetPhoneMode` + `RunnerController.SetAutoMove(1,
   hopWhenBlocked)`; used when the phone opens (`AirportSequence`) and closes (`ClosePhone`, `FlySequence`). The intro hands
