@@ -29,8 +29,10 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Screens: boarding-pass booking cards, duty-free tag shop items, polaroid photos + tilted stamp, departures-board flight
   board, pill buttons with a pulsing gold selection outline (`SelectionHighlight`).
 - Checked at 16:9 only. Subagent's clean keyboard + mouse Play session had 0 errors; the gamepad loop worked.
-- Not compiled yet: the FlightBoard shows the gate countdown during phone apps, and the `{PhoneControls}` menu token.
-- Known: the debug panel wraps the long save path; `Game.unity` has suspicious local UI overrides (not pushed).
+- The FlightBoard gate countdown during phone apps and the `{PhoneControls}` menu token compile (dotnet build), but aren't
+  yet seen in Play mode.
+- Stale UI overrides saved into `Game.unity` were reverted; the scene stays prefab-instances only.
+- Known: the debug panel wraps the long save path. On the original machine, restart Unity first (see HANDOFF.md).
 
 ## Placeholder sound effects (awaiting user playtest)
 - [x] All 17 SFX hooks in `Data/SoundLibrary.asset` have generated clips (`Assets/_Project/Placeholder/Audio/SFX/<id>.wav`,

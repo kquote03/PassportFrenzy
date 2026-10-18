@@ -18,22 +18,29 @@ Done in this session, in order:
 | `b966244` | **Airport backdrop**: the user's generated tileable terminal image is the wall of the indoor airport chunks | Screenshots |
 | `5a46b75`, `84d7a56` | **Player run cycle** from the artist's `Assets/Art/RunningAnimation` via `SpriteFrameAnimator` (art committed unchanged) | Play mode screenshot, user OK |
 | `c1ccace` | **Placeholder SFX**: 17 generated clips (`Tools/sfx/generate_sfx.py`) assigned in `SoundLibrary.asset` | Clips resolve in edit mode |
-| *(this commit)* | **Airport UI restyle** (UI subagent): rounded, airport palette, boarding-pass booking cards, duty-free tags, departures-board flight board, visible controller selection. Plus 2 small fixes (see below) | Subagent's clean Play session: zero errors; **the last 2 fixes are not compiled yet** |
+| `6079031` | **Airport UI restyle** (UI subagent): rounded, airport palette, boarding-pass booking cards, duty-free tags, departures-board flight board, visible controller selection. Plus 2 small fixes (see below) | Subagent's clean Play session: zero errors; the 2 fixes compile (dotnet), not yet seen in Play |
 
-## ⚠ Verify first (the editor was blocked when this was pushed)
-1. **Unity showed a modal "Scene(s) Have Been Modified" dialog** (from an EditMode test run) that blocked all MCP calls.
-   Dismiss it in the editor; also close the "Unity Version Control" window if it's open.
-2. **`Assets/_Project/Scenes/Game.unity` has local, uncommitted changes on the original machine only**: about 650 lines of
-   prefab-instance overrides (UI anchors/sizes zeroed, TMP style hashes). They were deliberately **not** pushed because they
-   might override the new UI layout. If you see them, inspect them, and most likely revert them
-   (`git checkout -- Assets/_Project/Scenes/Game.unity`). The scene should only hold `PF_GameRoot` + `PF_MainCamera` with no layout overrides.
-3. **Not compiled yet** (written while the editor was blocked):
-   - `Scripts/UI/FlightBoardView.cs`: the gate countdown shows whenever the spawner is in Chase mode (the chase starts at booking,
-     so it now shows during residency/shop too); before booking it reads "Book your flight!".
-   - `Scripts/Input/InputPrompts.cs` + `Scripts/UI/MainMenuView.cs`: new `{PhoneControls}` token, so the main menu bar reads
-     `[Mouse] Phone` / `[R-Stick]+[RT] Phone`.
-   → Run `AssetDatabase.Refresh()` (Auto Refresh is OFF), check `recompile_status` / console, run the 16 EditMode tests
-   (`PassportFrenzy.Tests.EditMode`), then a Play-mode smoke test (PlaytestAutopilot, AGENTS.md §11).
+## State of `main` (workable)
+- **Compiles cleanly:** Runtime, Editor and Tests assemblies build with 0 errors and 0 warnings (checked with
+  `dotnet build PassportFrenzy.Tests.EditMode.csproj` outside Unity, because the Unity MCP bridge was wedged; see below).
+- **`Game.unity` is the clean version:** only `PF_GameRoot` + `PF_MainCamera`, no UI overrides. A local save had added about
+  650 lines of stale UI prefab-instance overrides (old font colours, zeroed anchors, TMP style hashes) that fought the new
+  UI prefabs. They were reverted and never pushed.
+- **Two small fixes, compiled but not yet seen in Play mode:**
+  - `FlightBoardView`: shows the gate countdown whenever the spawner is in Chase mode (the chase starts at booking, so also
+    during residency/shop); "Book your flight!" before that.
+  - `{PhoneControls}` prompt token: the main menu bar reads `[Mouse] Phone` / `[R-Stick]+[RT] Phone`.
+
+## ⚠ First thing on the original dev machine: restart Unity
+The editor's MCP bridge stopped answering (every command times out) after a test run got stuck behind a modal "Scene(s) Have
+Been Modified" dialog. The editor still holds the stale scene overrides **in memory**.
+1. Close Unity. If it asks to save `Game.unity`, choose **Don't Save** (saving would bring the stale overrides back).
+2. Reopen the project, then press Ctrl+R (Auto Refresh is OFF).
+3. Run the 16 EditMode tests (`PassportFrenzy.Tests.EditMode`).
+4. Do a Play-mode smoke test: PlaytestAutopilot on keyboard and gamepad (AGENTS.md §11). Check the flight board during the
+   shop and the main-menu controls bar.
+
+A fresh clone on another machine doesn't need any of this.
 
 ## Next tasks (agreed with the user, in order)
 The user wants to **playtest after each feature** before the next one starts: implement → verify → stop → wait for feedback → push.
