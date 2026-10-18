@@ -719,3 +719,42 @@ MonoBehaviour:
   idleFrame: 0
   airborneFrame: 8
   idleSpeedFraction: 0.08
+  idleFrames:
+  - {fileID: 2800000, guid: eb6be3f97e05e984dbc1270018817314, type: 3}
+  - {fileID: 2800000, guid: dda0e1ef00f97e84ca041f42a433c69c, type: 3}
+  - {fileID: 2800000, guid: a571f4f5f8b55cc4ca201cac8bc98343, type: 3}
+  - {fileID: 2800000, guid: c21233ee533002e46813d2c65f6765c8, type: 3}
+  - {fileID: 2800000, guid: 0d0cda1fbc0ea9a478856013929ae567, type: 3}
+  - {fileID: 2800000, guid: 6f18df57824516949a98cb1d30d110f2, type: 3}
+  - {fileID: 2800000, guid: c5c923992a9b10c4f839415e80166c24, type: 3}
+  - {fileID: 2800000, guid: c5e65037da4303743bc1633709b59b1e, type: 3}
+  - {fileID: 2800000, guid: a0005b32b2bc9cc45b06d3df9dd204e8, type: 3}
+  - {fileID: 2800000, guid: c24694602ae5580429d6f84a83b589ac, type: 3}
+  - {fileID: 2800000, guid: e564bae2021b7bf4b9cde47d7b2875cf, type: 3}
+  - {fileID: 2800000, guid: 823ff74fec0827c46894c9fc76b33cf8, type: 3}
+  - {fileID: 2800000, guid: 5df8a6b231bac3b4ea6cd8ba538fff53, type: 3}
+  - {fileID: 2800000, guid: 866b4577b9aa68c4caa64479ae79c87a, type: 3}
+  idleFramesPerSecond: 12
+  idlePivot: {x: 0.5, y: 0.012}
+  jumpFrames:
+  - {fileID: 2800000, guid: e0f55226e061093458f4a0e3f37cc00a, type: 3}
+  - {fileID: 2800000, guid: 4a866a316a191c849a50903dc3ddbf6f, type: 3}
+  - {fileID: 2800000, guid: ff411c796b414ca4e88eec070437c82f, type: 3}
+  - {fileID: 2800000, guid: e4ff96529921f284a99534ce5ffea95f, type: 3}
+  - {fileID: 2800000, guid: e4226a1e860183647848c08eddd48a82, type: 3}
+  - {fileID: 2800000, guid: 9763305779d47374babe7366f1a59d42, type: 3}
+  - {fileID: 2800000, guid: 88f848b8554c5b14d9585c55aa36ba10, type: 3}
+  - {fileID: 2800000, guid: f7450651e10c0b14c963f6d540669ed8, type: 3}
+  - {fileID: 2800000, guid: 4283c763649156e469df534979af4a15, type: 3}
+  - {fileID: 2800000, guid: 46c36a43902971b47a582f787e14f08b, type: 3}
+  - {fileID: 2800000, guid: 1066c26e42370874f9cc6a0beb1827b1, type: 3}
+  - {fileID: 2800000, guid: ea6c9eafd161d9142a2056eee2eb6210, type: 3}
+  - {fileID: 2800000, guid: 2990193e4f11d8043b1ca81bd5d3f51f, type: 3}
+  - {fileID: 2800000, guid: da4bcea4e2ac0ed42bab447cf62493a1, type: 3}
+  jumpPivot: {x: 0.5, y: 0.005}
+  jumpRiseStart: 2
+  jumpFallStart: 8
+  jumpLandStart: 11
+  landSeconds: 0.15
+  landMaxSpeedFraction: 0.5
+  minAirSeconds: 0.15

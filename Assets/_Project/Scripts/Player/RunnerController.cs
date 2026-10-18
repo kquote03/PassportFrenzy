@@ -38,6 +38,7 @@ namespace PassportFrenzy
         public bool HasShield { get; private set; }
         public float BoostSecondsRemaining => _boostTimer;
         public float CurrentSpeed { get; private set; }
+        public float VerticalSpeed => _rb != null ? _rb.linearVelocity.y : 0f;
         public bool InCrowd => _crowds.Count > 0;
 
         GameTuning T => GameRoot.I.tuning;

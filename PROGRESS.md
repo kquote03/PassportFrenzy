@@ -41,6 +41,31 @@ _Updated with every commit. If you're an agent resuming work: read AGENTS.md, th
 - Regenerate with `python Tools/sfx/generate_sfx.py` (Python standard library only, deterministic). Levels are balanced
   (peaks about -3 dBFS, quieter for the jump/mash/alarm sounds). Music hooks (`music_<countryId>`) are still empty.
 
+## Artist idle/jump animation + suitcase and cone art (awaiting user playtest)
+- [x] `SpriteFrameAnimator` gained an idle clip (`idleFrames`, 14 frames looping at 12 fps) and a jump clip (`jumpFrames`,
+  14 frames) with their own foot pivots (`idlePivot` 0.012, `jumpPivot` 0.005; the frames are 410 × 581 vs 410 × 400 for the run).
+- Jump frames follow vertical velocity (`RunnerController.VerticalSpeed`), not time: frames 3–8 while rising (take-off, then
+  tuck at the apex), 9–11 while falling, 12–14 (crouch) for `landSeconds` (0.15) after a landing, only below half speed
+  (`landMaxSpeedFraction`) so running out of a jump stays fluid. Frames 1–2 (anticipation) are unused because the jump is
+  instant. Hops shorter than `minAirSeconds` skip the crouch. Empty idle/jump lists fall back to the old held run frames.
+- `PF_Obstacle_Suitcase`: Visual = `Assets/Art/SuitCases` (sliced sprite `SuitCaseN_0`), 1.9 units tall incl. handle (half
+  the player's drawn standing height of about 3.8 units), new `RandomSpriteVariant` picks one of the 4 colours per spawn.
+  Placeholder Handle/Strap removed. Trigger 0.8 × 1.0 → 0.9 × 1.3 to cover the case body (the thin handle sticks out above);
+  1.3 is the block-height limit, still clearable with the 2.4 jump apex.
+- Crowds (`PF_Crowd_Street` / `_Airport` / `_Japan_Commuters`): placeholder people are 2× taller (3.0–3.8 units, about the
+  player's height), feet kept on the ground, heads kept round. Trigger zones unchanged (6 / 7 / 5 × 2.4 units).
+- Pixel scale for new art that should match the player: 125 px per world unit (the player animator's `pixelsPerUnit`).
+- `PF_Obstacle_Cone`: Visual = `Assets/Art/TrafficCone`, 1 unit tall. Placeholder Band/Base removed; collider unchanged.
+- `PF_Obstacle_Barrier` (block): 1.4 tall × 1.54 wide, hitbox 1.0 × 1.2 → 1.4 × 1.2. Placeholder Stripe/LegL/LegR removed.
+- `PF_Obstacle_LuggageCart` (block): 1.25 tall × 1.98 wide (handle and wheels included), hitbox 1.2 → 1.4 wide over the bags,
+  1.1 tall. Placeholder Bag1/Bag2/Handle/Wheels removed.
+- `PF_Obstacle_WetFloor` (slow): sign 1.3 tall × 0.77 wide, hitbox 0.6 × 1.0 → 0.7 × 1.2. The placeholder puddle under it was removed.
+- `PF_Obstacle_Puddle` (slow): 1.8 wide, the drawn puddle's bottom edge on the ground; hitbox unchanged.
+  **Known:** `Assets/Art/Puddle/Puddle.png` has an opaque white background, so it shows as a white box until the artist
+  re-exports it with transparency (same file name; nothing else to change).
+- Verified: Runtime, Editor and EditMode test assemblies compile with Unity's bundled Roslyn (0 errors). Not yet seen in Play mode.
+- The new art's `.meta` files (in `Assets/Art`) must be committed with it: the prefabs reference their GUIDs and sprite IDs.
+
 ## Player running animation (done, pushed)
 - [x] `PF_Player/Visual` plays the artist's 14-frame cycle from `Assets/Art/RunningAnimation` (read-only: no files or import
   settings in `Assets/Art` were changed). The artist's importer auto-sliced each frame into uneven pieces, so the new

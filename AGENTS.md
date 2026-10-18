@@ -149,8 +149,13 @@ Assets/_Project/
    Chunks keep their decorative sprites (buildings, windows, signs) under a `Backdrop` child. Also art, also free to replace.
 5. The player's `RunnerController` animates the Visual transform (squash on jump, run bob/lean, hit flash, boost tint).
    When you add a real Animator, untick **Procedural Animation** on `PF_Player` (and, if needed, animate a child *under* Visual).
-   Current state: `PF_Player/Visual` has a `SpriteFrameAnimator` playing `Assets/Art/RunningAnimation` (whole textures,
-   so how you slice them in the importer doesn't matter). Add or replace frames in its `frames` list; Procedural Animation is off.
+   Current state: `PF_Player/Visual` has a `SpriteFrameAnimator` playing `Assets/Art/RunningAnimation`, `IdleAnimation` and
+   `JumpingAnimation` (whole textures, so how you slice them in the importer doesn't matter). Add or replace frames in its
+   `frames` / `idleFrames` / `jumpFrames` lists; Procedural Animation is off.
+   Obstacles with artist art: `PF_Obstacle_Suitcase` (`Assets/Art/SuitCases`, a random colour per spawn through
+   `RandomSpriteVariant`), `PF_Obstacle_Cone`, `PF_Obstacle_Barrier`, `PF_Obstacle_LuggageCart`, `PF_Obstacle_Puddle` and
+   `PF_Obstacle_WetFloor` (`Assets/Art/TrafficCone`, `Barrier`, `LuggageCart`, `Puddle`, `WetFloorSign`). These reference the
+   importer's sliced sprites (`<Name>_0`), so commit the art's `.meta` files with it.
 6. UI: phone/menu prefabs are in `Prefabs/UI`. Swap Image sprites and TMP fonts freely. Don't rename objects that scripts
    reference through serialized fields (re-link them in the Inspector if you do).
 7. **Never run `Passport Frenzy/Rebuild ALL (overwrites)`** after you've started swapping art: it regenerates every prefab from code.
